@@ -5,7 +5,7 @@
 Models|A model of a software architecture in three abstraction levels:<br>-Physical models<br>-Architectural models (Which servers/clients communicate with which)<br>-Fundamental models (How do we handle interactions between two server/clients etc)
 Synchronous vs. Asynchronous|
 Security Model|Sending communication through open networks should handle security so that external entities cannot intercept, understand, misuse, edit the communication sent
-Reliability|The application should continue to work correctly despite hardware, software or human errors. 
+Reliability|The application should continue to work correctly despite hardware, software or human errors.<br>The ability to operate is compromised.
 Scalability|When the system grows, there should be reasonable ways to deal with it.
 Maintainability|It should be possible for multiple developers to productively work on the application without disrupting the current behaviour.
 Load parameter|The load parameters are used to monitor performance of an application. Load parameters are chosen to be the most expensive action such as requests to a web server or the ratio between reads and writes in a database.
