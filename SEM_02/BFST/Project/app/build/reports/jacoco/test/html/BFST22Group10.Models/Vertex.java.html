@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Vertex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">Vertex.java</span></div><h1>Vertex.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Vertex extends Node implements Comparable&lt;Vertex&gt;, Pointable, Serializable {
+    public static final long serialVersionUID = 33;
+    private ArrayList&lt;Edge&gt; neighbors;
+    private float distToSource;
+    private float distToDestination;
+    private int priorityQueueIndex;
+    
+    public Vertex(float lat, float lon) {
+<span class="fc" id="L14">        super(lat, lon);</span>
+<span class="fc" id="L15">    }</span>
+    
+    public void addEdge(short speedLimit, long toId, boolean isCarAllowed, boolean isBicycleAllowed, boolean isPedestrianAllowed, String streetName){
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        if (neighbors == null) neighbors = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L19">        Vertex destination = Model.getVertexFromId(toId);</span>
+<span class="fc" id="L20">        float distanceBetweenVertices = Model.calculateDistance(this.getMainLon(), this.getMainLat(), destination.getMainLon(), destination.getMainLat());</span>
+<span class="fc" id="L21">        Edge edge = new Edge(speedLimit, toId, distanceBetweenVertices, isCarAllowed, isBicycleAllowed, isPedestrianAllowed, streetName);</span>
+<span class="fc" id="L22">        neighbors.add(edge);</span>
+<span class="fc" id="L23">    }</span>
+
+    public float getDistToSource() {
+<span class="fc" id="L26">        return distToSource;</span>
+    }
+    
+    public void setDistToSource(float distToSource) {
+<span class="fc" id="L30">        this.distToSource = distToSource;</span>
+<span class="fc" id="L31">    }</span>
+
+    public void setDistToDestination(float distToDestination){
+<span class="fc" id="L34">        this.distToDestination = distToDestination;</span>
+<span class="fc" id="L35">    }</span>
+    
+    public void setDistToDestination(Vertex destination, ModeOfTransport modeOfTransport) {
+<span class="fc" id="L38">        this.distToDestination = Model.calculateDistance(this.getMainLon(), this.getMainLat(), destination.getMainLon(), destination.getMainLat());</span>
+        
+<span class="fc bfc" id="L40" title="All 3 branches covered.">        switch (modeOfTransport){</span>
+            case CAR:
+<span class="fc" id="L42">                this.distToDestination = this.distToDestination / 80f;</span>
+<span class="fc" id="L43">                break;</span>
+            case BICYCLE:
+<span class="fc" id="L45">                this.distToDestination = this.distToDestination / 20f;</span>
+                break;
+        }
+<span class="fc" id="L48">    }</span>
+
+    public float getSourceAndDestinationDistance(){
+<span class="fc" id="L51">        return distToSource + distToDestination;</span>
+    }
+    
+    public ArrayList&lt;Edge&gt; getNeighbors() {
+<span class="fc" id="L55">        return neighbors;</span>
+    }
+    
+    @Override
+    public boolean isVertex() {
+<span class="fc" id="L60">        return true;</span>
+    }
+    
+    @Override
+    public int compareTo(Vertex other) {
+<span class="fc" id="L65">        return Float.compare(this.getSourceAndDestinationDistance(), other.getSourceAndDestinationDistance());</span>
+    }
+    
+    public int getIndex() {
+<span class="fc" id="L69">        return priorityQueueIndex;</span>
+    }
+    
+    public void setIndex(int index) {
+<span class="fc" id="L73">        this.priorityQueueIndex = index;</span>
+<span class="fc" id="L74">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

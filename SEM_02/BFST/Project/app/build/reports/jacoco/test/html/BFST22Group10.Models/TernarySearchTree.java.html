@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TernarySearchTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">TernarySearchTree.java</span></div><h1>TernarySearchTree.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.concurrent.LinkedBlockingQueue;
+
+// Inspiration https://dev.to/mlarocca/prefix-search-with-ternary-search-trees-java-implementation-2jdh
+<span class="fc" id="L9">public class TernarySearchTree implements Serializable {</span>
+    public static final long serialVersionUID = 15;
+    private String key;
+    private Address address;
+    private TernarySearchTree left;
+    private TernarySearchTree middle;
+    private TernarySearchTree right;
+
+    private void insertWord(String word, int index, Address address) {
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        if(this.key == null) {</span>
+<span class="fc" id="L19">            this.key = word.substring(index, index + 1).intern();</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        } else if (reducedTreeIsExpandable(word, index)) {</span>
+<span class="fc" id="L21">            expandTree(word, index);</span>
+        }
+
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if(word.substring(index).equals(this.key)) {</span>
+<span class="fc" id="L25">            this.address = address;</span>
+        }
+        else {
+<span class="fc" id="L28">            insertWordInTheCorrectChild(word, index, address);</span>
+        }
+<span class="fc" id="L30">    }</span>
+
+    private void insertWordInTheCorrectChild(String word, int index, Address address) {
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (word.substring(index).startsWith(this.key)) {</span>
+<span class="fc" id="L34">            this.middle = createNewTreeIfNullAndInsertWord(this.middle, word, index + this.key.length(), address);</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        } else if (word.charAt(index) &lt; this.key.charAt(0)){</span>
+<span class="fc" id="L36">            this.left = createNewTreeIfNullAndInsertWord(this.left, word, index, address);</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        } else if (word.charAt(index) &gt; this.key.charAt(0)){</span>
+<span class="fc" id="L38">            this.right = createNewTreeIfNullAndInsertWord(this.right, word, index, address);</span>
+        }
+<span class="fc" id="L40">    }</span>
+
+    private boolean reducedTreeIsExpandable(String word, int index) {
+<span class="pc bpc" id="L43" title="1 of 4 branches missed.">        return this.key.length() &gt; 1 &amp;&amp; this.key.charAt(0) == word.charAt(index);</span>
+    }
+
+    private void expandTree(String word, int index) {
+<span class="fc" id="L47">        int cutOffIndex = index;</span>
+<span class="pc bpc" id="L48" title="1 of 4 branches missed.">        while (cutOffIndex &lt; word.length() &amp;&amp; word.charAt(cutOffIndex) == this.key.charAt(cutOffIndex - index)) {</span>
+<span class="fc" id="L49">            cutOffIndex++;</span>
+        }
+
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if (cutOffIndex &gt; index) {</span>
+<span class="fc" id="L53">            TernarySearchTree newMiddle = TernarySearchTree.copy(this);</span>
+<span class="fc" id="L54">            this.left = null;</span>
+<span class="fc" id="L55">            this.middle = newMiddle;</span>
+<span class="fc" id="L56">            this.right = null;</span>
+<span class="fc" id="L57">            this.address = null;</span>
+<span class="fc" id="L58">            middle.key = this.key.substring(cutOffIndex - index).intern();</span>
+<span class="fc" id="L59">            this.key = word.substring(index, cutOffIndex).intern();</span>
+        }
+<span class="fc" id="L61">    }</span>
+
+    private static TernarySearchTree copy(TernarySearchTree original) {
+<span class="fc" id="L64">        TernarySearchTree returnTree = new TernarySearchTree();</span>
+<span class="fc" id="L65">        returnTree.address = original.address;</span>
+<span class="fc" id="L66">        returnTree.left = original.left;</span>
+<span class="fc" id="L67">        returnTree.middle = original.middle;</span>
+<span class="fc" id="L68">        returnTree.right = original.right;</span>
+<span class="fc" id="L69">        return returnTree;</span>
+    }
+
+    private TernarySearchTree createNewTreeIfNullAndInsertWord(TernarySearchTree tree, String word, int index, Address address) {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (tree == null) tree = new TernarySearchTree();</span>
+<span class="fc" id="L74">        tree.insertWord(word, index, address);</span>
+<span class="fc" id="L75">        return tree;</span>
+    }
+    
+    // DFS
+    public void reduceTree(){
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        while(this.isReducible()){</span>
+<span class="fc" id="L81">            this.key = (this.key + this.middle.key).intern();</span>
+<span class="fc" id="L82">            this.address = this.middle.address;</span>
+<span class="fc" id="L83">            this.middle = this.middle.middle;</span>
+        }
+
+<span class="fc" id="L86">        reduceChildren();</span>
+<span class="fc" id="L87">    }</span>
+
+    private void reduceChildren() {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if(this.left != null){</span>
+<span class="fc" id="L91">            this.left.reduceTree();</span>
+        }
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        if(this.middle != null){</span>
+<span class="fc" id="L94">            this.middle.reduceTree();</span>
+        }
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if(this.right != null){</span>
+<span class="fc" id="L97">            this.right.reduceTree();</span>
+        }
+<span class="fc" id="L99">    }</span>
+    
+    private boolean isReducible(){
+<span class="pc bpc" id="L102" title="1 of 8 branches missed.">        return     this.address == null</span>
+                &amp;&amp; this.middle != null
+                &amp;&amp; this.middle.left == null
+                &amp;&amp; this.middle.right == null;
+    }
+    
+    private TernarySearchTree search(String word){
+<span class="pc bpc" id="L109" title="1 of 4 branches missed.">        if(this.key == null || word.length() == 0){</span>
+<span class="fc" id="L110">            return null;</span>
+        }
+        
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if(key.startsWith(word)){</span>
+<span class="fc" id="L114">            return this;</span>
+        }
+
+<span class="fc" id="L117">        return searchChildren(word);</span>
+    }
+
+    private TernarySearchTree searchChildren(String word) {
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if(word.startsWith(key)){</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">            return this.middle == null ? null : this.middle.search(word.substring(key.length()));</span>
+        }
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if(word.compareTo(key) &lt; 0){</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">            return this.left == null ? null : this.left.search(word);</span>
+        }
+        else {
+<span class="fc bfc" id="L129" title="All 2 branches covered.">            return this.right == null ? null : this.right.search(word);</span>
+        }
+    }
+    
+    // BFS
+    public HashSet&lt;Address&gt; prefixSearch(String prefix){
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (prefix == null) return null;</span>
+<span class="fc" id="L136">        prefix = prefix.toLowerCase(Locale.ROOT);</span>
+<span class="fc" id="L137">        HashSet&lt;Address&gt; addresses = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L138">        TernarySearchTree prefixTree = search(prefix);</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        if(prefixTree == null) return addresses;</span>
+<span class="fc" id="L140">        LinkedBlockingQueue&lt;TernarySearchTree&gt; queue = new LinkedBlockingQueue&lt;&gt;();</span>
+
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        if(prefixTree.isEndOfString()){</span>
+<span class="fc" id="L143">            addresses.add(prefixTree.address);</span>
+        }
+        
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        if(prefixTree.middle != null){</span>
+<span class="fc" id="L147">            queue.add(prefixTree.middle);</span>
+        }
+
+<span class="fc" id="L150">        return addFirstTenAddresses(queue, addresses);</span>
+    }
+
+    private HashSet&lt;Address&gt; addFirstTenAddresses(LinkedBlockingQueue&lt;TernarySearchTree&gt; queue, HashSet&lt;Address&gt; addresses) {
+<span class="fc bfc" id="L154" title="All 4 branches covered.">        while(!queue.isEmpty() &amp;&amp; addresses.size() &lt; 10) {</span>
+<span class="fc" id="L155">            TernarySearchTree tree = queue.poll();</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">            if(tree.isEndOfString()){</span>
+<span class="fc" id="L157">                addresses.add(tree.address);</span>
+            }
+<span class="fc bfc" id="L159" title="All 2 branches covered.">            if(tree.left != null){</span>
+<span class="fc" id="L160">                queue.add(tree.left);</span>
+            }
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            if(tree.middle != null){</span>
+<span class="fc" id="L163">                queue.add(tree.middle);</span>
+            }
+<span class="fc bfc" id="L165" title="All 2 branches covered.">            if(tree.right != null){</span>
+<span class="fc" id="L166">                queue.add(tree.right);</span>
+            }
+<span class="fc" id="L168">        }</span>
+<span class="fc" id="L169">        return addresses;</span>
+    }
+    
+    private boolean isEndOfString() {
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        return this.address != null;</span>
+    }
+
+    public void insert(Address address) {
+<span class="fc" id="L177">        insertWord(address.toString().toLowerCase(Locale.ROOT), 0, address);</span>
+<span class="fc" id="L178">    }</span>
+
+    public Address getAddress(String address) {
+<span class="fc" id="L181">        address = address.toLowerCase(Locale.ROOT);</span>
+<span class="fc" id="L182">        TernarySearchTree tree = this.search(address);</span>
+<span class="pc bpc" id="L183" title="1 of 4 branches missed.">        if (tree != null &amp;&amp; tree.isEndOfString()) {</span>
+<span class="fc" id="L184">            return tree.address;</span>
+        }
+<span class="fc" id="L186">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Edge.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">Edge.java</span></div><h1>Edge.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import java.io.Serializable;
+
+public class Edge implements Serializable {
+    public static final long serialVersionUID = 30;
+    private float distance;
+    private short speedLimit;
+    private boolean isCarAllowed;
+    private boolean isBicycleAllowed;
+    private boolean isPedestrianAllowed;
+    private String streetName;
+    private long toId;
+    
+<span class="fc" id="L15">    public Edge(short speedLimit, long to, float distance, boolean isCarAllowed, boolean isBicycleAllowed, boolean isPedestrianAllowed, String streetName) {</span>
+<span class="fc" id="L16">        this.toId = to;</span>
+<span class="fc" id="L17">        this.distance = distance;</span>
+<span class="fc" id="L18">        this.speedLimit = speedLimit;</span>
+<span class="fc" id="L19">        this.isCarAllowed = isCarAllowed;</span>
+<span class="fc" id="L20">        this.isBicycleAllowed = isBicycleAllowed;</span>
+<span class="fc" id="L21">        this.isPedestrianAllowed = isPedestrianAllowed;</span>
+<span class="fc" id="L22">        this.streetName = streetName.intern();</span>
+<span class="fc" id="L23">    }</span>
+
+    public String getStreetName() {
+<span class="fc" id="L26">        return streetName;</span>
+    }
+
+    public float getDistance(ModeOfTransport modeOfTransport){
+<span class="pc bpc" id="L30" title="1 of 3 branches missed.">        switch (modeOfTransport){</span>
+            case CAR:
+<span class="fc" id="L32">                return distance / speedLimit;</span>
+            case BICYCLE:
+<span class="nc" id="L34">                return distance / 20f;</span>
+        }
+<span class="fc" id="L36">        return distance;</span>
+    }
+
+    public float getDistance() {
+<span class="fc" id="L40">        return distance;</span>
+    }
+
+    public float getSpeedLimit() {
+<span class="fc" id="L44">        return speedLimit;</span>
+    }
+    
+    public long getTo() {
+<span class="fc" id="L48">        return toId;</span>
+    }
+    
+    public boolean isTransportModeAllowed(ModeOfTransport modeOfTransport){
+<span class="pc bpc" id="L52" title="1 of 4 branches missed.">        switch (modeOfTransport){</span>
+            case CAR:
+<span class="fc" id="L54">                return isCarAllowed;</span>
+            case BICYCLE:
+<span class="fc" id="L56">                return isBicycleAllowed;</span>
+            case WALK:
+<span class="fc" id="L58">                return isPedestrianAllowed;</span>
+        }
+<span class="nc" id="L60">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

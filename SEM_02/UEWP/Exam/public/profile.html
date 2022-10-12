@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rideit</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/profile.css">
+</head>
+<body>
+    <script type="module" src="scripts/authentication.js"> </script>
+    <!-- Following section creates the green map at the top of the screen -->
+    <div id="greenMapContainer">
+        <img src="img/CityMap.png" alt="flex-row" id="greenMap"/>
+    </div>
+
+    <div id="account-container">
+        <img id="account-pic" alt="" src="img/logo.svg">
+        <p id="account-name"></p>
+    </div>
+
+    <div id="all-profile-buttons"></div>
+
+    <!-- Following five lines creates a button in profile, used by JS to create several ones -->
+    <div id="originalButton" class="button-container">
+        <a href="">
+            <button class="button filled"></button>
+        </a>
+    </div>
+
+    <!-- Following section creates the menubar -->
+    <div id="menubar-container">
+        <div id="menubar">
+            <div class="menuitem">
+                <a href="index.html">
+                    <span class="material-icons">home</span>
+                </a>
+            </div>
+            <div class="menuitem">
+                <a href="profile.html">
+                    <span class="material-icons">account_circle</span>
+                </a>
+            </div>
+            <div class="menuitem">
+                <a href="help.html">
+                    <span class="material-icons">help</span>
+                </a>
+            </div>
+            <div class="menuitem">
+                <a href="contact.html">
+                    <span class="material-icons">textsms</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Following section creates the back-button -->
+    <button id="back-button" onclick="history.back()">
+        <span class="material-icons">arrow_back</span>
+    </button>
+</body>
+</html>

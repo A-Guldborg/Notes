@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="1253.0" prefWidth="1556.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.exam.chillhub.controllers.HomeController">
+   <children>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <content>
+            <VBox fx:id="categories" prefHeight="0.0" prefWidth="1554.0" spacing="24.0" />
+         </content>
+      </ScrollPane>
+      <Button fx:id="test" mnemonicParsing="false" onAction="#onTestAction" prefHeight="25.0" prefWidth="65.0" text="Button" />
+   </children>
+</AnchorPane>

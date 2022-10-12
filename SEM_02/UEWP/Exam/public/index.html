@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rideit</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/index.css">
+</head>
+<body>
+<div class="container">
+
+    <!-- Background MAP -->
+    <div id="map">
+        <img src="img/map.png" class="img" alt="flex-row"  />
+    </div>
+    <!-- searchbar -->
+    <div class="searchBar">
+        <input id="searchQueryInput" type="text" name="searchQueryInput" placeholder="Search" value="" />
+        <button id="searchQuerySubmit" type="submit" name="searchQuerySubmit">
+            <span class="material-icons" id="search">search</span>
+        </button>
+    </div>
+
+    <!-- car buttons -->
+    <div class="carButtons" id="cars">
+        <button id="btn1" type = button name="car1"></button>
+        <button id="btn2" type = button name="car2"></button>
+        <button id="btn3" type = button name="car3"></button>
+        <button id="btn4" type = button name="car4"></button>
+        <button id="btn5" type = button name="car5"></button>
+    </div>
+
+    <!-- popupbox -->
+    <div id="popupbox">
+        <span class="material-icons" id="closebutton">close</span>
+        <div id="details">
+            <p>Car: <span id="popupcar"></span></p>
+            <p>Power: <span id="popuppower"></span></p>
+            <p>Distance: <span id="popupdistance"></span></p>
+            <p>Price: <span id="popupprice"></span></p>
+            <p>Res: <span id="popupreservation"></span></p>
+        </div>
+        <div class="box filled" id="reservebutton">
+            Reserve now
+        </div>
+    </div>
+</div>
+
+    <!-- Following section creates the menubar -->
+    <div id="menubar-container">
+        <div id="menubar">
+            <div class="menuitem">
+                <a href="index.html">
+                    <span class="material-icons">home</span>
+                </a>
+            </div>
+            <div class="menuitem">
+                <a href="profile.html">
+                    <span class="material-icons">account_circle</span>
+                </a>
+            </div>
+            <div class="menuitem">
+                <a href="help.html">
+                    <span class="material-icons">help</span>
+                </a>
+            </div>
+            <div class="menuitem">
+                <a href="contact.html">
+                    <span class="material-icons">textsms</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="scripts/index.js"> </script>
+</html>

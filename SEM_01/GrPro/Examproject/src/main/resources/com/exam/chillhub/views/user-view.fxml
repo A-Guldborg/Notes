@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="borderPane" prefHeight="1000.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.exam.chillhub.controllers.UserViewController">
+    <center>
+        <AnchorPane fx:id="mainPane" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+
+        </AnchorPane>
+    </center>
+    <top>
+        <AnchorPane BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+            </BorderPane.margin>
+            <HBox alignment="CENTER" prefWidth="200.0" spacing="16.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <HBox alignment="CENTER_LEFT" prefWidth="300.0" spacing="16.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#onUsersAction" styleClass="ui-transparent" stylesheets="@../styles.css" text="Users" />
+                    </children>
+                </HBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#homeAction" styleClass="ui-transparent" stylesheets="@../styles.css" text="Home" />
+                <Button mnemonicParsing="false" onAction="#moviesAction" styleClass="ui-transparent" stylesheets="@../styles.css" text="Movies" />
+                <Button mnemonicParsing="false" onAction="#seriesAction" styleClass="ui-transparent" stylesheets="@../styles.css" text="Series" />
+                <ComboBox fx:id="categoryPicker" onAction="#categorySelect" prefWidth="150.0" styleClass="ui-transparent" stylesheets="@../styles.css" />
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER_RIGHT" prefWidth="300.0" spacing="16.0">
+                    <children>
+                        <TextField fx:id="searchInput" onAction="#searchAction" styleClass="ui-transparent" stylesheets="@../styles.css" />
+                        <Button mnemonicParsing="false" onAction="#searchAction" styleClass="ui-transparent" stylesheets="@../styles.css" text="Search" />
+                    </children>
+                </HBox>
+            </HBox>
+        </AnchorPane>
+    </top>
+</BorderPane>

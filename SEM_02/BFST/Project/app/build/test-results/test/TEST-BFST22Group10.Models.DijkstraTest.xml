@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="BFST22Group10.Models.DijkstraTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2022-05-11T20:06:54" hostname="Andreass-MacBook-Air-4.local" time="0.257">
+  <properties/>
+  <testcase name="findShortestPathTest2()" classname="BFST22Group10.Models.DijkstraTest" time="0.16"/>
+  <testcase name="findShortestPathTest3()" classname="BFST22Group10.Models.DijkstraTest" time="0.03"/>
+  <testcase name="findShortestPathTest()" classname="BFST22Group10.Models.DijkstraTest" time="0.032"/>
+  <testcase name="findPathsTest()" classname="BFST22Group10.Models.DijkstraTest" time="0.012"/>
+  <testcase name="testLoopInShortestPath()" classname="BFST22Group10.Models.DijkstraTest" time="0.007"/>
+  <system-out><![CDATA[length: 3
+lat: 0.0 lon: 0.0
+lat: 0.0 lon: 0.0
+lat: 0.0 lon: 0.0
+length: 3
+lat: 10.0 lon: 10.0
+lat: 10.0 lon: 10.0
+lat: 10.0 lon: 10.0
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

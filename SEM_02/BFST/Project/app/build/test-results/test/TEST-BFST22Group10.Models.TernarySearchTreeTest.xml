@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="BFST22Group10.Models.TernarySearchTreeTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2022-05-11T20:07:00" hostname="Andreass-MacBook-Air-4.local" time="0.043">
+  <properties/>
+  <testcase name="getInvalidAddress()" classname="BFST22Group10.Models.TernarySearchTreeTest" time="0.006"/>
+  <testcase name="insertWordAfterReduction()" classname="BFST22Group10.Models.TernarySearchTreeTest" time="0.015"/>
+  <testcase name="searchNullAddress()" classname="BFST22Group10.Models.TernarySearchTreeTest" time="0.002"/>
+  <testcase name="getAddress()" classname="BFST22Group10.Models.TernarySearchTreeTest" time="0.002"/>
+  <testcase name="emptySearchReturnsNull()" classname="BFST22Group10.Models.TernarySearchTreeTest" time="0.002"/>
+  <testcase name="searchFullAddress()" classname="BFST22Group10.Models.TernarySearchTreeTest" time="0.002"/>
+  <testcase name="searchReturnsCorrectAmount()" classname="BFST22Group10.Models.TernarySearchTreeTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

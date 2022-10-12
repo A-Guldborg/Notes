@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Controller.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10</a> &gt; <span class="el_source">Controller.java</span></div><h1>Controller.java</h1><pre class="source lang-java linenums">package BFST22Group10;
+
+import BFST22Group10.Models.*;
+import BFST22Group10.Views.*;
+
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.transform.NonInvertibleTransformException;
+import javafx.scene.control.ToggleGroup;
+import javafx.stage.FileChooser;
+import javafx.stage.Popup;
+import javafx.stage.Stage;
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import static javafx.scene.paint.Color.*;
+
+public class Controller {
+    private Popup popUpPOI;
+    private Popup popUpRoute;
+    private Point2D lastMouse;
+    private final Model model;
+    private final View view;
+    private long lastDraw;
+<span class="nc" id="L34">    private boolean routeTimer = true;</span>
+<span class="nc" id="L35">    private boolean showNearestRoadField = false;</span>
+<span class="nc" id="L36">    private boolean debugNearestNeighbor = false;</span>
+<span class="nc" id="L37">    private boolean debugTree = false;</span>
+<span class="nc" id="L38">    private boolean debugRouteSearch = false;</span>
+<span class="nc" id="L39">    private boolean hasTrailer = false;</span>
+<span class="nc" id="L40">    private boolean fromTo = true;</span>
+<span class="nc" id="L41">    private boolean isKDTree = false;</span>
+<span class="nc" id="L42">    private boolean blackWhite = true;</span>
+<span class="nc" id="L43">    private boolean routeSearch = true;</span>
+    private final Stage primaryStage;
+    private Vertex nearestNeighbor;
+<span class="nc" id="L46">    private ModeOfTransport modeOfTransport = ModeOfTransport.CAR;</span>
+    private ArrayList&lt;Float&gt; currentRouteLats;
+    private ArrayList&lt;Float&gt; currentRouteLons;
+    private float[][] visitedEdgesLats;
+    private float[][] visitedEdgesLons;
+    private Address from;
+    private Address to;
+<span class="nc" id="L53">    private final HashMap&lt;String, Vertex&gt; pointsOfInterest = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L55">    public Controller(Stage primaryStage, InputStream path, String pathName) throws IOException {</span>
+<span class="nc" id="L56">        model = new Model(path, pathName);</span>
+<span class="nc" id="L57">        view = new View(primaryStage, this, model.getLatLonProportions());</span>
+<span class="nc" id="L58">        view.zoomToBox(model.getMinLat(), model.getMaxLat(), model.getMinLon(), model.getMaxLon(), 0.002f);</span>
+<span class="nc" id="L59">        draw();</span>
+<span class="nc" id="L60">        primaryStage.widthProperty().addListener((observable, oldValue, newValue) -&gt; draw());</span>
+<span class="nc" id="L61">        primaryStage.heightProperty().addListener((observable, oldValue, newValue) -&gt; draw());</span>
+<span class="nc" id="L62">        this.primaryStage = primaryStage;</span>
+<span class="nc" id="L63">        createMenu();</span>
+<span class="nc" id="L64">        setAddressFieldVisibility();</span>
+<span class="nc" id="L65">        createPopUps();</span>
+<span class="nc" id="L66">    }</span>
+
+    private void createPopUps() {
+<span class="nc" id="L69">        popUpPOI = new Popup();</span>
+<span class="nc" id="L70">        popUpPOI.getContent().add(popUpPOIBox);</span>
+<span class="nc" id="L71">        popUpRoute = new Popup();</span>
+<span class="nc" id="L72">        popUpRoute.getContent().add(popUpRouteBox);</span>
+<span class="nc" id="L73">    }</span>
+
+    private void createMenu() {
+<span class="nc" id="L76">        String os = System.getProperty(&quot;os.name&quot;);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if(os.contains(&quot;Mac&quot;)){</span>
+<span class="nc" id="L78">            menuBar.setLayoutX(-100);</span>
+<span class="nc" id="L79">            menuBar.setLayoutY(-100);</span>
+<span class="nc" id="L80">            addressSearchBar.setLayoutX(3);</span>
+<span class="nc" id="L81">            addressSearchBar.setLayoutY(3);</span>
+<span class="nc" id="L82">            menuBar.setUseSystemMenuBar(true);</span>
+
+        }
+<span class="nc" id="L85">        primaryStage.setMinHeight(525);</span>
+<span class="nc" id="L86">        primaryStage.setMinWidth(1000);</span>
+<span class="nc" id="L87">        mapCanvas.setOnContextMenuRequested(event -&gt; {</span>
+<span class="nc" id="L88">            contextMenu.show(mapCanvas, event.getScreenX(), event.getScreenY());</span>
+<span class="nc" id="L89">        });</span>
+<span class="nc" id="L90">    }</span>
+
+    private void FromToHere(Boolean isFrom) throws NonInvertibleTransformException {
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if(routeSearch){</span>
+<span class="nc" id="L94">            showRouteSearch();</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            fromTo = !fromTo;</span>
+        }
+<span class="nc" id="L97">        Point2D point = mapCanvas.inverseTransform((float)lastMouse.getX(), (float)lastMouse.getY());</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if(isFrom) {</span>
+<span class="nc" id="L99">            from = (Address) model.getNearestNeighborVertex((float) point.getX(), (float) point.getY(), true);</span>
+<span class="nc" id="L100">            addressSearchBar.getEditor().setText(from.toString());</span>
+        }
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if(!isFrom){</span>
+<span class="nc" id="L103">            to = (Address) model.getNearestNeighborVertex((float) point.getX(), (float) point.getY(), true);</span>
+<span class="nc" id="L104">            secondAddressSearchBar.getEditor().setText(to.toString());</span>
+        }
+<span class="nc" id="L106">        findShortestPath();</span>
+<span class="nc" id="L107">    }</span>
+
+    private void draw() {
+<span class="nc" id="L110">        long currentTime = Calendar.getInstance().getTimeInMillis();</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (currentTime &lt; lastDraw + 30) return;</span>
+<span class="nc" id="L112">        lastDraw = currentTime;</span>
+<span class="nc" id="L113">        view.mapCanvas.clear(model.isIsland());</span>
+
+<span class="nc" id="L115">        HashMap&lt;Tag, ArrayList&lt;OSMElement&gt;&gt; elements = new HashMap&lt;&gt;();</span>
+        try {
+<span class="nc" id="L117">            elements = model.spatialTreeSearchQuery(view.getBoundaryOfScreenBox(debugTree), (int) mapCanvas.getZoomLvl());</span>
+        }
+<span class="nc" id="L119">        catch (NonInvertibleTransformException e) {</span>
+<span class="nc" id="L120">            System.err.println(e.getMessage());</span>
+<span class="nc" id="L121">        }</span>
+
+<span class="nc" id="L123">        drawIslands();</span>
+
+<span class="nc" id="L125">        drawByTag(elements);</span>
+
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (debugNearestNeighbor) view.drawAddressPoint(nearestNeighbor.getMainLat(), nearestNeighbor.getMainLon(), Color.RED);</span>
+
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if(debugTree) drawTreeDebug();</span>
+
+<span class="nc" id="L131">        drawRoute();</span>
+
+<span class="nc bnc" id="L133" title="All 4 branches missed.">        if (from != null &amp;&amp; !pointsOfInterest.containsKey(from.toString())) drawAddress(from, RED);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (to != null) drawAddress(to, GREEN);</span>
+
+<span class="nc" id="L136">        drawZoomRuler();</span>
+
+<span class="nc" id="L138">        drawPOIs();</span>
+<span class="nc" id="L139">    }</span>
+
+    private void drawAddress(Address address, Color color){
+<span class="nc" id="L142">        view.drawAddressPoint(address.getMainLat(), address.getMainLon(), color);</span>
+<span class="nc" id="L143">    }</span>
+
+    private void drawPOIs() {
+<span class="nc" id="L146">        pointsOfInterest.entrySet().stream().forEach(</span>
+<span class="nc" id="L147">                input -&gt; view.drawAddressPoint(input.getValue().getMainLat(), input.getValue().getMainLon(), RED));</span>
+<span class="nc" id="L148">    }</span>
+
+    private void drawZoomRuler() {
+<span class="nc" id="L151">        int meters = (int) (Math.floor(10 + 2000000 / mapCanvas.getZoomLvl()) * 10);</span>
+<span class="nc" id="L152">        label.setText(&quot;Distance: &quot; + meters + &quot;m&quot;);</span>
+<span class="nc" id="L153">        view.drawZoomRuler(meters);</span>
+<span class="nc" id="L154">    }</span>
+
+    private void drawRoute() {
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if(debugRouteSearch) {</span>
+<span class="nc" id="L158">            view.drawLines(visitedEdgesLons, visitedEdgesLats, Color.ORANGE, 0.0001, blackWhite, true);</span>
+        }
+
+<span class="nc bnc" id="L161" title="All 8 branches missed.">        if (currentRouteLats != null &amp;&amp; currentRouteLons != null &amp;&amp; currentRouteLons.size() != 0 &amp;&amp; currentRouteLats.size() != 0) {</span>
+<span class="nc" id="L162">            view.drawPath(currentRouteLons, currentRouteLats);</span>
+        }
+<span class="nc" id="L164">    }</span>
+
+    private void drawTreeDebug() {
+        try {
+<span class="nc" id="L168">            view.drawBox(view.getBoundaryOfScreenBox(debugTree));</span>
+<span class="nc" id="L169">        } catch (NonInvertibleTransformException e) {</span>
+<span class="nc" id="L170">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L171">        }</span>
+<span class="nc" id="L172">    }</span>
+
+    private void drawByTag(HashMap&lt;Tag, ArrayList&lt;OSMElement&gt;&gt; elements) {
+<span class="nc bnc" id="L175" title="All 2 branches missed.">        for (Tag tag : Tag.values()) {</span>
+<span class="nc bnc" id="L176" title="All 4 branches missed.">            if (!debugTree &amp;&amp; tag == Tag.DEBUG) continue;</span>
+<span class="nc" id="L177">            ArrayList&lt;OSMElement&gt; osmElements = elements.get(tag);</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if(mapCanvas.getZoomLvl() &lt; tag.getRequiredZoomLevel()) continue;</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">            for (OSMElement element : osmElements) {</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">                if (element.isPolygon()) {</span>
+<span class="nc" id="L181">                    view.drawPolygon(element.getLon(), element.getLat(), tag.getColor(), blackWhite);</span>
+                }
+                else {
+<span class="nc bnc" id="L184" title="All 2 branches missed.">                    if (element.getLon().length &gt; 0) {</span>
+<span class="nc bnc" id="L185" title="All 4 branches missed.">                        view.drawLines(element.getLon(), element.getLat(), tag.getColor(), tag.getLineWidth()+0.5 / mapCanvas.getZoomLvl(), blackWhite, tag == Tag.DEBUG || tag == Tag.ROUTE_FERRY);</span>
+                    }
+                }
+<span class="nc" id="L188">            }</span>
+        }
+<span class="nc" id="L190">    }</span>
+
+    private void drawIslands() {
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        if (isKDTree) {</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">            for (OSMElement c: model.getIslands()) {</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                if (c.isPolygon()) {</span>
+<span class="nc" id="L196">                    view.drawPolygon(c.getLon(), c.getLat(), Tag.PLACE.getColor(), blackWhite);</span>
+                }
+<span class="nc" id="L198">            }</span>
+        }
+<span class="nc" id="L200">    }</span>
+
+    private void zoom(double factor, double x, double y) {
+<span class="nc" id="L203">        mapCanvas.zoom(factor, x, y);</span>
+<span class="nc" id="L204">        draw();</span>
+<span class="nc" id="L205">    }</span>
+
+    private void createNewMenu(String name){
+<span class="nc" id="L208">        Menu newMenu = new Menu(name);</span>
+<span class="nc" id="L209">        MenuItem menuOne = new MenuItem(&quot;Go to&quot;);</span>
+<span class="nc" id="L210">        menuOne.setOnAction(λ -&gt; {</span>
+<span class="nc" id="L211">            addressSearchBar.getEditor().setText(pointsOfInterest.get(name).toString());</span>
+<span class="nc" id="L212">            searchAddress();</span>
+<span class="nc" id="L213">            searchSingleAddress();</span>
+<span class="nc" id="L214">        });</span>
+<span class="nc" id="L215">        MenuItem menuTwo = new MenuItem(&quot;Remove&quot;);</span>
+<span class="nc" id="L216">        menuTwo.setOnAction(λ -&gt; {</span>
+<span class="nc" id="L217">            menuPOI.getItems().remove(newMenu);</span>
+<span class="nc" id="L218">            pointsOfInterest.remove(name);</span>
+<span class="nc" id="L219">            drawPOIs();</span>
+<span class="nc" id="L220">        });</span>
+<span class="nc" id="L221">        newMenu.getItems().addAll(menuOne, menuTwo);</span>
+<span class="nc" id="L222">        menuPOI.getItems().add(newMenu);</span>
+<span class="nc" id="L223">    }</span>
+
+    @FXML
+    public MapCanvas mapCanvas;
+    public ComboBox&lt;String&gt; addressSearchBar;
+    public TextField label;
+    public MenuBar menuBar;
+    public ComboBox&lt;String&gt; secondAddressSearchBar;
+    public ToggleGroup wayToTravelGroup;
+    public Button pathButton;
+    public Button RouteSearchButton;
+    public RadioButton radioButtonCar;
+    public RadioButton radioButtonBicycle;
+    public RadioButton radioButtonWalk;
+    public CheckBox checkBoxTrailer;
+    public Button GoButton;
+    public TextField addressField;
+    public ContextMenu contextMenu;
+    public TextField searchTime;
+    public Button flipButton;
+    public VBox popUpPOIBox;
+    public VBox popUpRouteBox;
+    public TextField inputPOI;
+    public Menu menuPOI;
+    public TextArea routeDescriptionTextArea;
+
+    @FXML
+    private void searchSingleAddress(){
+<span class="nc bnc" id="L251" title="All 2 branches missed.">        if (from != null) {</span>
+<span class="nc" id="L252">            view.zoomToBox(from.getMainLat(), from.getMainLat(), from.getMainLon(), from.getMainLon(), 0.002f);</span>
+<span class="nc" id="L253">            draw();</span>
+        }
+<span class="nc" id="L255">    }</span>
+
+    @FXML
+    private void showRouteSearch(){
+<span class="nc bnc" id="L259" title="All 2 branches missed.">        if(routeSearch) {</span>
+<span class="nc" id="L260">            RouteSearchButton.setText(&quot;X&quot;);</span>
+<span class="nc" id="L261">            pathButton.setVisible(true);</span>
+<span class="nc" id="L262">            radioButtonCar.setVisible(true);</span>
+<span class="nc" id="L263">            radioButtonBicycle.setVisible(true);</span>
+<span class="nc" id="L264">            radioButtonWalk.setVisible(true);</span>
+<span class="nc" id="L265">            checkBoxTrailer.setVisible(true);</span>
+<span class="nc" id="L266">            secondAddressSearchBar.setVisible(true);</span>
+<span class="nc" id="L267">            flipButton.setVisible(true);</span>
+<span class="nc" id="L268">            GoButton.setVisible(false);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">            routeSearch=!routeSearch;</span>
+        }else{
+<span class="nc" id="L271">            RouteSearchButton.setText(&quot;Route Search&quot;);</span>
+<span class="nc" id="L272">            pathButton.setVisible(false);</span>
+<span class="nc" id="L273">            radioButtonCar.setVisible(false);</span>
+<span class="nc" id="L274">            radioButtonBicycle.setVisible(false);</span>
+<span class="nc" id="L275">            radioButtonWalk.setVisible(false);</span>
+<span class="nc" id="L276">            checkBoxTrailer.setVisible(false);</span>
+<span class="nc" id="L277">            secondAddressSearchBar.setVisible(false);</span>
+<span class="nc" id="L278">            flipButton.setVisible(false);</span>
+<span class="nc" id="L279">            GoButton.setVisible(true);</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            routeSearch=!routeSearch;</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">            fromTo = !fromTo;</span>
+<span class="nc" id="L282">            currentRouteLons = null;</span>
+<span class="nc" id="L283">            currentRouteLats = null;</span>
+<span class="nc" id="L284">            popUpRoute.hide();</span>
+<span class="nc" id="L285">            addressSearchBar.getEditor().setText(&quot;&quot;);</span>
+<span class="nc" id="L286">            secondAddressSearchBar.getEditor().setText(&quot;&quot;);</span>
+<span class="nc" id="L287">            from = null;</span>
+<span class="nc" id="L288">            to = null;</span>
+<span class="nc" id="L289">            draw();</span>
+        }
+<span class="nc" id="L291">    }</span>
+
+    @FXML
+    private void searchAddress(){
+        try {
+<span class="nc" id="L296">            String input = addressSearchBar.getEditor().getText();</span>
+<span class="nc" id="L297">            from = model.addressSearch(input);</span>
+<span class="nc" id="L298">        } catch (NullPointerException e){</span>
+<span class="nc" id="L299">            from = null;</span>
+<span class="nc" id="L300">        }</span>
+<span class="nc" id="L301">    }</span>
+
+    @FXML
+    private void searchAddressTwo(){
+        try {
+<span class="nc" id="L306">            String input = secondAddressSearchBar.getValue();</span>
+<span class="nc" id="L307">            to = model.addressSearch(input);</span>
+<span class="nc" id="L308">        } catch (NullPointerException e){</span>
+<span class="nc" id="L309">            to = null;</span>
+<span class="nc" id="L310">        }</span>
+<span class="nc" id="L311">    }</span>
+
+    @FXML
+    private void suggestAddress(KeyEvent keyEvent) {
+<span class="nc" id="L315">        ComboBox&lt;String&gt; searchBar = (ComboBox&lt;String&gt;) keyEvent.getSource();</span>
+<span class="nc" id="L316">        String input = searchBar.getEditor().getText();</span>
+<span class="nc bnc" id="L317" title="All 2 branches missed.">        if (input.length() &lt; 1) {</span>
+<span class="nc" id="L318">            searchBar.hide();</span>
+<span class="nc" id="L319">            return;</span>
+        }
+<span class="nc" id="L321">        HashSet&lt;Address&gt; addresses = model.getAddressSuggestions(input);</span>
+<span class="nc" id="L322">        ObservableList&lt;String&gt; suggestions = searchBar.getItems();</span>
+<span class="nc" id="L323">        suggestions.clear();</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">        for (Address address : addresses) {</span>
+<span class="nc" id="L325">            suggestions.add(address.toString());</span>
+<span class="nc" id="L326">        }</span>
+<span class="nc" id="L327">        searchBar.show();</span>
+<span class="nc" id="L328">        searchBar.setValue(input);</span>
+<span class="nc" id="L329">    }</span>
+
+    @FXML
+    private void findShortestPath(){
+<span class="nc" id="L333">        Long start = System.nanoTime();</span>
+<span class="nc bnc" id="L334" title="All 4 branches missed.">        if(from == null||to == null) return;</span>
+<span class="nc" id="L335">        Vertex v1 = (Vertex) model.getNearestNeighborVertex(from.getMainLon(), from.getMainLat(), false);</span>
+<span class="nc" id="L336">        Vertex v2 = (Vertex) model.getNearestNeighborVertex(to.getMainLon(), to.getMainLat(), false);</span>
+
+<span class="nc" id="L338">        PathFinder pathFinder = new PathFinder(v1, v2, modeOfTransport, model.getVerticesCount(), hasTrailer);</span>
+<span class="nc" id="L339">        ArrayList&lt;Vertex&gt; path = new ArrayList&lt;&gt;(pathFinder.getFullPath());</span>
+
+<span class="nc" id="L341">        currentRouteLons = routeToDraw(path, false);</span>
+<span class="nc" id="L342">        currentRouteLats = routeToDraw(path, true);</span>
+
+<span class="nc" id="L344">        setVisitedEdgesInShortestPath(pathFinder.getVisitedEdgesLons(), pathFinder.getVisitedEdgesLats());</span>
+
+
+<span class="nc" id="L347">        float minLat = Math.min(from.getMainLat(), to.getMainLat());</span>
+<span class="nc" id="L348">        float maxLat = Math.max(from.getMainLat(), to.getMainLat());</span>
+<span class="nc" id="L349">        float minLon = Math.min(from.getMainLon(), to.getMainLon());</span>
+<span class="nc" id="L350">        float maxLon = Math.max(from.getMainLon(), to.getMainLon());</span>
+
+<span class="nc" id="L352">        view.zoomToBox(minLat, maxLat, minLon, maxLon, 0.008f);</span>
+
+<span class="nc" id="L354">        draw();</span>
+<span class="nc" id="L355">        showRouteDescription(pathFinder.getRouteDescription());</span>
+<span class="nc" id="L356">        double timeUsage = (System.nanoTime() - start) / 1000000000.0;</span>
+<span class="nc" id="L357">        searchTime.setText(&quot;Search Time: &quot;+ String.format(&quot;%.2f&quot;, timeUsage)+&quot; seconds&quot;);</span>
+<span class="nc" id="L358">    }</span>
+
+    private void setVisitedEdgesInShortestPath(ArrayList&lt;float[]&gt; lons, ArrayList&lt;float[]&gt; lats) {
+<span class="nc" id="L361">        visitedEdgesLons = new float[lons.size()][];</span>
+<span class="nc" id="L362">        visitedEdgesLats = new float[lats.size()][];</span>
+
+<span class="nc bnc" id="L364" title="All 2 branches missed.">        for (int i = 0; i &lt; lons.size(); i++) {</span>
+<span class="nc" id="L365">            visitedEdgesLons[i] = lons.get(i);</span>
+<span class="nc" id="L366">            visitedEdgesLats[i] = lats.get(i);</span>
+        }
+<span class="nc" id="L368">    }</span>
+
+    private ArrayList&lt;Float&gt; routeToDraw(ArrayList&lt;Vertex&gt; path, boolean lats){
+<span class="nc" id="L371">        ArrayList&lt;Float&gt; coords = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">        for (int i = 0; i &lt; path.size(); i++) {</span>
+<span class="nc bnc" id="L373" title="All 2 branches missed.">            coords.add(lats ? path.get(i).getMainLat() : path.get(i).getMainLon());</span>
+        }
+<span class="nc" id="L375">        return coords;</span>
+    }
+
+    @FXML
+    private void selectWayToTravel(){
+<span class="nc" id="L380">        RadioButton selectedRadioButton = (RadioButton) wayToTravelGroup.getSelectedToggle();</span>
+<span class="nc" id="L381">        String wayToTravel = selectedRadioButton.getText();</span>
+<span class="nc" id="L382">        modeOfTransport = ModeOfTransport.valueOf(wayToTravel.toUpperCase());</span>
+<span class="nc" id="L383">        checkBoxTrailer.setVisible(modeOfTransport.equals(ModeOfTransport.CAR));</span>
+<span class="nc" id="L384">    }</span>
+
+    @FXML
+    private void hasTrailer() {
+<span class="nc bnc" id="L388" title="All 2 branches missed.">        hasTrailer = !hasTrailer;</span>
+<span class="nc" id="L389">        System.out.println(hasTrailer);</span>
+<span class="nc" id="L390">    }</span>
+
+    @FXML
+    private void onScroll(ScrollEvent e) {
+<span class="nc" id="L394">        zoom(Math.pow(1.005, e.getDeltaY()), e.getX(), e.getY());</span>
+<span class="nc" id="L395">    }</span>
+
+    @FXML
+    private void onMousePressed(MouseEvent e) {
+<span class="nc" id="L399">        lastMouse = new Point2D(e.getX(), e.getY());</span>
+<span class="nc" id="L400">        contextMenu.hide();</span>
+<span class="nc" id="L401">    }</span>
+
+    @FXML
+    private void onMouseDragged(MouseEvent e) {
+<span class="nc" id="L405">        double dx = e.getX() - lastMouse.getX();</span>
+<span class="nc" id="L406">        double dy = e.getY() - lastMouse.getY();</span>
+<span class="nc" id="L407">        mapCanvas.pan(dx, dy);</span>
+<span class="nc" id="L408">        lastMouse = new Point2D(e.getX(), e.getY());</span>
+<span class="nc" id="L409">        draw();</span>
+<span class="nc" id="L410">    }</span>
+
+    @FXML
+    private void findNearestNeighbor(MouseEvent e) throws NonInvertibleTransformException {
+<span class="nc bnc" id="L414" title="All 4 branches missed.">        if(showNearestRoadField || debugNearestNeighbor) {</span>
+<span class="nc" id="L415">            Point2D point2D = mapCanvas.inverseTransform((float) e.getX(), (float) e.getY());</span>
+<span class="nc" id="L416">            nearestNeighbor = (Vertex) model.getNearestNeighborVertex((float) point2D.getX(), (float) point2D.getY(), false);</span>
+<span class="nc" id="L417">            VBox.setMargin(addressField, new Insets(0, 3, 0, 150));</span>
+<span class="nc" id="L418">            addressField.setMinWidth(0);</span>
+<span class="nc" id="L419">            addressField.setMaxWidth(100);</span>
+<span class="nc bnc" id="L420" title="All 2 branches missed.">            if(nearestNeighbor.getNeighbors().size()==0){</span>
+<span class="nc" id="L421">                addressField.setText(nearestNeighbor.toString());</span>
+            }else {
+<span class="nc" id="L423">                addressField.setText(nearestNeighbor.getNeighbors().get(0).getStreetName());</span>
+            }
+<span class="nc" id="L425">            draw();</span>
+        }
+<span class="nc" id="L427">    }</span>
+
+    @FXML
+    private void changeColor(){
+<span class="nc bnc" id="L431" title="All 2 branches missed.">        blackWhite = !blackWhite;</span>
+<span class="nc" id="L432">        draw();</span>
+<span class="nc" id="L433">    }</span>
+
+    @FXML
+    private void showSpatialTreeDebug(){
+<span class="nc bnc" id="L437" title="All 2 branches missed.">        debugTree = !debugTree;</span>
+<span class="nc" id="L438">        draw();</span>
+<span class="nc" id="L439">    }</span>
+
+    @FXML
+    private void uploadFile(){
+<span class="nc" id="L443">        FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L444">        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(&quot;Serialized and OSM files&quot;, &quot;*.obj&quot;, &quot;*.osm&quot;, &quot;*.OSM&quot;));</span>
+<span class="nc" id="L445">        File file = fileChooser.showOpenDialog(primaryStage);</span>
+<span class="nc bnc" id="L446" title="All 2 branches missed.">        if(file!=null) {</span>
+<span class="nc" id="L447">            primaryStage.close();</span>
+            try {
+<span class="nc" id="L449">                App.restart(primaryStage, file.getPath());</span>
+<span class="nc" id="L450">            } catch (IOException | XMLStreamException e) {</span>
+<span class="nc" id="L451">                System.err.println(e.getMessage());</span>
+<span class="nc" id="L452">            }</span>
+        }
+<span class="nc" id="L454">    }</span>
+
+    @FXML
+    private void serializeFile(){
+<span class="nc" id="L458">        FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L459">        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(&quot;Serialized&quot;, &quot;*.obj&quot;));</span>
+<span class="nc" id="L460">        File saveDirectory = fileChooser.showSaveDialog(primaryStage);</span>
+<span class="nc bnc" id="L461" title="All 2 branches missed.">        if (saveDirectory != null) {</span>
+<span class="nc" id="L462">            Thread saveThread = new Thread(() -&gt; {</span>
+<span class="nc" id="L463">                System.out.println(&quot;Starting saving&quot;);</span>
+                try {
+<span class="nc" id="L465">                    model.save(saveDirectory.getAbsolutePath());</span>
+<span class="nc" id="L466">                } catch (IOException e) {</span>
+<span class="nc" id="L467">                    e.printStackTrace();</span>
+<span class="nc" id="L468">                }</span>
+<span class="nc" id="L469">                System.out.println(&quot;Done saving&quot;);</span>
+<span class="nc" id="L470">            });</span>
+<span class="nc" id="L471">            saveThread.setDaemon(false);</span>
+<span class="nc" id="L472">            saveThread.start();</span>
+        }
+<span class="nc" id="L474">    }</span>
+
+    @FXML
+    private void plusPushed(){
+<span class="nc" id="L478">        zoom(1.5, mapCanvas.getWidth() / 2, mapCanvas.getHeight() / 2);</span>
+<span class="nc" id="L479">    }</span>
+
+    @FXML
+    private void minusPushed(){
+<span class="nc" id="L483">        zoom(0.5, mapCanvas.getWidth() / 2, mapCanvas.getHeight() / 2);</span>
+<span class="nc" id="L484">    }</span>
+
+    @FXML
+    private void changeSpatialTree() {
+<span class="nc bnc" id="L488" title="All 2 branches missed.">        isKDTree = !isKDTree;</span>
+<span class="nc" id="L489">        model.changeSpatialTree(isKDTree);</span>
+<span class="nc" id="L490">        draw();</span>
+<span class="nc" id="L491">    }</span>
+
+    @FXML
+    private void NearestNeighbor(){
+<span class="nc bnc" id="L495" title="All 2 branches missed.">        debugNearestNeighbor = !debugNearestNeighbor;</span>
+<span class="nc" id="L496">    }</span>
+
+    @FXML
+    private void directionsFromHere() throws NonInvertibleTransformException {
+<span class="nc" id="L500">        FromToHere(true);</span>
+<span class="nc" id="L501">    }</span>
+
+    @FXML
+    private void directionsToHere() throws NonInvertibleTransformException {
+<span class="nc" id="L505">        FromToHere(false);</span>
+<span class="nc" id="L506">    }</span>
+
+    @FXML
+    private void pointOfInterest(){
+<span class="nc" id="L510">        popUpPOI.show(primaryStage);</span>
+<span class="nc" id="L511">        popUpRoute.hide();</span>
+<span class="nc" id="L512">    }</span>
+
+    @FXML
+    private void debugRouteSearch() {
+<span class="nc bnc" id="L516" title="All 2 branches missed.">        debugRouteSearch = !debugRouteSearch;</span>
+<span class="nc" id="L517">    }</span>
+
+    @FXML
+    private void timer(){
+<span class="nc bnc" id="L521" title="All 2 branches missed.">        routeTimer = !routeTimer;</span>
+<span class="nc" id="L522">        searchTime.setVisible(routeTimer);</span>
+<span class="nc" id="L523">        draw();</span>
+<span class="nc" id="L524">    }</span>
+
+    @FXML
+    private void setAddressFieldVisibility(){
+<span class="nc bnc" id="L528" title="All 2 branches missed.">        showNearestRoadField = !showNearestRoadField;</span>
+<span class="nc" id="L529">        addressField.setVisible(showNearestRoadField);</span>
+<span class="nc" id="L530">        draw();</span>
+<span class="nc" id="L531">    }</span>
+
+    @FXML
+    private void flipAddress(){
+<span class="nc" id="L535">        String tempAddress = addressSearchBar.getEditor().getText();</span>
+<span class="nc" id="L536">        addressSearchBar.getEditor().setText(secondAddressSearchBar.getEditor().getText());</span>
+<span class="nc" id="L537">        secondAddressSearchBar.getEditor().setText(tempAddress);</span>
+<span class="nc" id="L538">        from = model.addressSearch(addressSearchBar.getEditor().getText());</span>
+<span class="nc" id="L539">        to = model.addressSearch(secondAddressSearchBar.getEditor().getText());</span>
+<span class="nc" id="L540">    }</span>
+
+    @FXML
+    private void addPOI() throws NonInvertibleTransformException {
+<span class="nc" id="L544">        String name = inputPOI.getText().toLowerCase(Locale.ROOT);</span>
+<span class="nc bnc" id="L545" title="All 2 branches missed.">        if(name.length() &lt; 3){</span>
+<span class="nc" id="L546">            Alert alert = new Alert(Alert.AlertType.NONE, &quot;Please provide a name with 3 or more letters&quot;,ButtonType.CLOSE);</span>
+<span class="nc" id="L547">            alert.show();</span>
+<span class="nc bnc" id="L548" title="All 2 branches missed.">        }else if(pointsOfInterest.containsKey(name)){</span>
+<span class="nc" id="L549">            Alert alert = new Alert(Alert.AlertType.NONE, &quot;Name already used, please use another&quot;,ButtonType.CLOSE);</span>
+<span class="nc" id="L550">            alert.show();</span>
+<span class="nc" id="L551">        }else{</span>
+<span class="nc" id="L552">            createNewMenu(name);</span>
+<span class="nc" id="L553">            Point2D point = mapCanvas.inverseTransform((float)lastMouse.getX(), (float)lastMouse.getY());</span>
+<span class="nc" id="L554">            Address poiAddress = new Address();</span>
+<span class="nc" id="L555">            poiAddress.setCity(inputPOI.getText());</span>
+<span class="nc" id="L556">            poiAddress.setLat((float)point.getY());</span>
+<span class="nc" id="L557">            poiAddress.setLon((float)point.getX());</span>
+<span class="nc" id="L558">            model.addAddress(poiAddress);</span>
+<span class="nc" id="L559">            pointsOfInterest.put(name, (Vertex) model.getNearestNeighborVertex((float) point.getX(), (float) point.getY(), true));</span>
+<span class="nc" id="L560">            draw();</span>
+<span class="nc" id="L561">            inputPOI.setText(&quot;&quot;);</span>
+<span class="nc" id="L562">            popUpPOI.hide();</span>
+        }
+<span class="nc" id="L564">    }</span>
+
+    private void showRouteDescription(ArrayList&lt;String&gt; description){
+<span class="nc" id="L567">        routeDescriptionTextArea.clear();</span>
+<span class="nc" id="L568">        popUpRoute.show(primaryStage);</span>
+
+        // JavaFX issue causing blurry texts fixed with the following lines of code https://stackoverflow.com/a/31622654
+<span class="nc" id="L571">        routeDescriptionTextArea.setCache(false);</span>
+<span class="nc" id="L572">        ScrollPane sp = (ScrollPane)routeDescriptionTextArea.getChildrenUnmodifiable().get(0);</span>
+<span class="nc" id="L573">        sp.setCache(false);</span>
+<span class="nc bnc" id="L574" title="All 2 branches missed.">        for (Node n : sp.getChildrenUnmodifiable()) {</span>
+<span class="nc" id="L575">            n.setCache(false);</span>
+<span class="nc" id="L576">        }</span>
+
+<span class="nc" id="L578">        popUpRoute.setX(primaryStage.getX() + primaryStage.getWidth() - popUpRoute.getWidth() - 40);</span>
+<span class="nc" id="L579">        popUpRoute.setY(primaryStage.getY() + 40);</span>
+<span class="nc bnc" id="L580" title="All 2 branches missed.">        for (String segment : description) {</span>
+<span class="nc" id="L581">            routeDescriptionTextArea.appendText(segment + &quot;\n\n&quot;);</span>
+<span class="nc" id="L582">        }</span>
+<span class="nc" id="L583">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

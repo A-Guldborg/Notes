@@ -1,0 +1,37 @@
+#originalReceipt {
+    visibility: hidden;
+}
+
+#all-receipts {
+    position: relative;
+    top: 20px;
+}
+
+.receipt {
+    text-align: center;
+    font-size: var(--mediumfont);
+}
+
+.box .material-icons {
+    font-size: 4em;
+    position: fixed;
+    left: 10px;
+}
+
+#closebutton {
+    position: fixed;
+    top: 5px;
+    left: 5px;
+}
+
+#popupbox {
+    display: none;
+    position: absolute;
+    top: 200px;
+    text-align: center;
+    border: 5px solid var(--black);
+    left: 50%;
+    transform: translate(-50%, 0);
+    background: var(--lightbrown);
+    width: 60%;
+}

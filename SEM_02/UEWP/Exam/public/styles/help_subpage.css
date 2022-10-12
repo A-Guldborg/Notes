@@ -1,0 +1,12 @@
+#header {
+    margin-top: 15px;
+}
+
+#main {
+    margin-top: 40px;
+    max-height: calc(100vh - 220px);
+    font-size: var(--mediumfont);
+    text-decoration: none;
+    text-align: left;
+    overflow: scroll;
+}

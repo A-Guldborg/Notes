@@ -1,0 +1,7 @@
+{
+  "name": "CafeAnalog",
+  "short_name": "CafeAnalog",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}

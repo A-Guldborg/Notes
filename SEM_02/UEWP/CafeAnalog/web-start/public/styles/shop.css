@@ -1,0 +1,79 @@
+#allcoffee {
+    display: grid;
+    gap: 100px;
+    margin: 120px 100px 100px;
+}
+
+#originalCoffee {
+    visibility: hidden;
+    position: fixed;
+}
+
+.coffeeBox {
+    display: inline-grid;
+    background: saddlebrown;
+    width: 300px;
+    height: 300px;
+    margin: auto;
+    border-radius: 25px;
+}
+
+.coffeeBox p {
+    text-align: center;
+}
+
+.coffeesvg {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+}
+
+#coffee0 {
+    grid-column-start: 1;
+    grid-column-end: 2;
+}
+
+#coffee1 {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+
+.ticket {
+    background: #87572D;
+    width: 47%;
+    margin: 15px auto;
+    border-radius: 15px;
+    padding: 1.5%;
+    border: 10px solid #5D3619;
+    position: absolute;
+    left: 25%;
+    top: 40%;
+}
+
+@media (min-device-width: 600px) {
+    #coffee2 {
+        grid-column-start: 3;
+        grid-column-end: 4;
+    }
+
+    .coffeeBox {
+        width: 200px;
+        height: 200px;
+    }
+
+    .ticket {
+        padding: 3.5% 1.5%;
+    }
+}
+
+@media (min-device-width: 1200px) {
+    #coffee3 {
+        grid-column-start: 4;
+        grid-column-end: 5;
+    }
+
+    #allcoffee {
+        margin-top: 0px;
+    }
+}
+

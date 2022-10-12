@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0"
+            prefWidth="600.0"
+            style="-fx-background-color: linear-gradient(from 25% 25% to 100% 100%, #734b6d, #42275a)linear-gradient(from 25% 25% to 100% 100%, #734b6d, #42275a);"
+            xmlns="http://javafx.com/javafx/11.0.2"
+            fx:controller="com.exam.chillhub.controllers.LoginViewController">
+    <children>
+        <VBox alignment="CENTER" layoutX="194.0" layoutY="179.0" spacing="8.0" AnchorPane.bottomAnchor="64.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="64.0">
+            <children>
+                <ImageView fitHeight="164.0" fitWidth="668.0" opacity="0.9" pickOnBounds="true" preserveRatio="true"
+                           VBox.vgrow="ALWAYS">
+                    <image>
+                        <Image url="@../chillhub-logo.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="WrongPasswordOrUsername" maxWidth="200.0" prefWidth="200.0"
+                       text="Incorrect Username or Password" textFill="#ff0808" visible="false"/>
+                <Label fx:id="UsernameAlreadyTaken" maxWidth="200.0" prefWidth="200.0" text="Username already taken"
+                       textFill="#ff0808" visible="false"/>
+                <TextField fx:id="username" maxWidth="200.0" onAction="#loginAction" promptText="Username"/>
+                <PasswordField fx:id="password" maxWidth="200.0" onAction="#loginAction" promptText="Password"/>
+                <Button maxWidth="200.0" mnemonicParsing="false" onAction="#loginAction" prefWidth="200.0"
+                        style="-fx-background-color: gold;" text="Log in"/>
+                <Button fx:id="registerAction" maxWidth="200.0" mnemonicParsing="false" onAction="#registerAction"
+                        prefWidth="200.0" text="Register"/>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

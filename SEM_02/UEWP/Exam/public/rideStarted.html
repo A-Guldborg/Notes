@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rideit</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/rideStarted.css">
+</head>
+<body>
+    <div class="container" >
+
+    <!-- Background MAP -->
+        <div id="map">
+            <img src="img/map.png" class="img" alt="flex-row"  />
+        </div>
+        <div class="pulse"> </div>
+
+        <!-- Icons -->
+        <div id="carinfo-container">
+            <div id="battery" class="infobox">
+      <span class="material-icons">
+      battery_5_bar
+      </span>
+                <div>BATTERY</div>
+                <div>83%</div>
+            </div>
+            <div id="platenumber" class="infobox">
+      <span class="material-icons">
+       directions_car
+      </span>
+                <div>SPEED</div>
+                <div>47km/h</div>
+            </div>
+            <div id="seats" class="infobox">
+      <span class="material-icons">
+      add_road
+      </span>
+                <div>ROAD</div>
+                <div>Brydes Allé</div>
+            </div>
+        </div>
+
+     <!-- botbutton -->
+    <div id="theWhiteBox">
+    <div id="botbutton">
+        <button class="openbtn" onclick="openNav()"></button>
+    </div>
+    </div>
+        <!-- expanding navbar -->
+        <div id="menubar" class="bar">
+            <button class="closebtn" onclick="closeNav()"></button>
+
+            <div class="center-xy">
+                <a id="box1" class="boxes">Price: 35 DKK </a>
+                <a id="box2" class="boxes">Time: 00:00:00 </a>
+                <input type="range" value="0" class="pullee"/>
+            </div>
+        </div>
+</div>
+</body>
+<script src="scripts/rideStarted.js"> </script>
+</html>

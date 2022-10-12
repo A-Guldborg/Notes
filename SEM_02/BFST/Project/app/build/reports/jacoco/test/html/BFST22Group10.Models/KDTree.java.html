@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KDTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">KDTree.java</span></div><h1>KDTree.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import java.util.ArrayList;
+
+<span class="fc" id="L5">public class KDTree implements SpatialTree {</span>
+    public static final long serialVersionUID = 10;
+<span class="fc" id="L7">    private ArrayList&lt;Pointable&gt; root = new ArrayList&lt;&gt;();</span>
+    private KDTree leftChild;
+    private KDTree rightChild;
+    private ArrayList&lt;OSMElement&gt; range;
+<span class="fc" id="L11">    private final int cutOffValue = 1000;</span>
+
+<span class="fc" id="L13">    public Pointable getRoot() { return root.get(0); }</span>
+<span class="fc" id="L14">    public ArrayList&lt;Pointable&gt; getRoots() { return root; }</span>
+<span class="fc" id="L15">    public KDTree getLeftChild() { return leftChild; }</span>
+<span class="fc" id="L16">    public KDTree getRightChild() { return rightChild; }</span>
+
+    public ArrayList&lt;OSMElement&gt; searchQuery(float minLat, float maxLat, float minLon, float maxLon, int maxDepth) {
+<span class="fc" id="L19">        range = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L20">        searchQueryHelper(this, minLat, maxLat, minLon, maxLon, true, minLat, maxLat, minLon, maxLon);</span>
+<span class="fc" id="L21">        return range;</span>
+    }
+
+    private void searchQueryHelper(KDTree tree, float minLat, float maxLat, float minLon, float maxLon, boolean xAxis, float debugMinLat, float debugMaxLat, float debugMinLon, float debugMaxLon) {
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">        if (tree == null) return;</span>
+<span class="fc" id="L26">        ArrayList&lt;Pointable&gt; roots = tree.getRoots();</span>
+
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (roots.size() == 1) {</span>
+<span class="fc" id="L29">            searchQueryHelperForNonLeaf(tree, roots, minLat, maxLat, minLon, maxLon, xAxis, debugMinLat, debugMaxLat, debugMinLon, debugMaxLon);</span>
+        }
+        else {
+<span class="fc" id="L32">            searchQueryHelperForLeaf(roots, maxLat, maxLon, minLon, minLat);</span>
+        }
+<span class="fc" id="L34">    }</span>
+
+    private void searchQueryHelperForNonLeaf(KDTree tree, ArrayList&lt;Pointable&gt; roots, float minLat, float maxLat, float minLon, float maxLon, boolean xAxis, float debugMinLat, float debugMaxLat, float debugMinLon, float debugMaxLon) {
+<span class="fc" id="L37">        Pointable root = roots.get(0);</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        float axisCoord = xAxis ? root.getMainLon() : root.getMainLat();</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        float minValue = xAxis ? minLon : minLat;</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        float maxValue = xAxis ? maxLon : maxLat;</span>
+
+<span class="fc" id="L42">        addDebugLine(xAxis, root, debugMinLon, debugMaxLon, debugMinLat, debugMaxLat, maxLat, minLat, maxLon, minLon);</span>
+
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        if(axisCoord &gt; minValue) {</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">            if (!xAxis)</span>
+<span class="fc" id="L46">                searchQueryHelper(tree.getLeftChild(), minLat, maxLat, minLon, maxLon, true, debugMinLat, axisCoord, debugMinLon, debugMaxLon);</span>
+            else
+<span class="fc" id="L48">                searchQueryHelper(tree.getLeftChild(), minLat, maxLat, minLon, maxLon, false, debugMinLat, debugMaxLat, debugMinLon, axisCoord);</span>
+        }
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if(axisCoord &lt; maxValue) {</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">            if (!xAxis)</span>
+<span class="nc" id="L52">                searchQueryHelper(tree.getRightChild(), minLat, maxLat, minLon, maxLon, true, axisCoord, debugMaxLat, debugMinLon, debugMaxLon);</span>
+            else
+<span class="fc" id="L54">                searchQueryHelper(tree.getRightChild(), minLat, maxLat, minLon, maxLon, false, debugMinLat, debugMaxLat, axisCoord, debugMaxLon);</span>
+        }
+<span class="pc bpc" id="L56" title="1 of 4 branches missed.">        if(axisCoord &gt;= minValue &amp;&amp; axisCoord &lt;= maxValue){</span>
+<span class="fc" id="L57">            OSMElement element = (OSMElement) root;</span>
+<span class="pc bpc" id="L58" title="4 of 8 branches missed.">            if (element.getMinLat() &lt;= maxLat &amp;&amp; element.getMinLon() &lt;= maxLon &amp;&amp; element.getMaxLat() &gt;= minLat &amp;&amp; element.getMaxLon() &gt;= minLon)</span>
+<span class="fc" id="L59">                range.add(element);</span>
+        }
+<span class="fc" id="L61">    }</span>
+
+    private void searchQueryHelperForLeaf(ArrayList&lt;Pointable&gt; roots, float maxLat, float maxLon, float minLon, float minLat) {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (Pointable point : roots) {</span>
+<span class="fc" id="L65">            OSMElement element = (OSMElement) point;</span>
+<span class="pc bpc" id="L66" title="3 of 8 branches missed.">            if (element.getMinLat() &lt;= maxLat &amp;&amp; element.getMinLon() &lt;= maxLon &amp;&amp; element.getMaxLat() &gt;= minLat &amp;&amp; element.getMaxLon() &gt;= minLon)</span>
+<span class="fc" id="L67">                range.add((OSMElement) point);</span>
+<span class="fc" id="L68">        }</span>
+<span class="fc" id="L69">    }</span>
+
+    private void addDebugLine(boolean xAxis, Pointable root, float debugMinLon, float debugMaxLon, float debugMinLat, float debugMaxLat, float maxLat, float minLat, float maxLon, float minLon) {
+<span class="fc" id="L72">        float[][] lats = new float[1][2];</span>
+<span class="fc" id="L73">        float[][] lons = new float[1][2];</span>
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (!xAxis) addDebugLineHelper(lats, lons, root.getMainLat(), root.getMainLat(), debugMinLon, debugMaxLon);</span>
+<span class="fc" id="L76">        else addDebugLineHelper(lats, lons, debugMinLat, debugMaxLat, root.getMainLon(), root.getMainLon());</span>
+
+<span class="fc" id="L78">        OSMElement debugLine = new OSMElement(lats, lons, false);</span>
+<span class="fc" id="L79">        debugLine.setMainTag(Tag.DEBUG);</span>
+
+<span class="pc bpc" id="L81" title="2 of 8 branches missed.">        if (debugLine.getMinLat() &lt;= maxLat &amp;&amp; debugLine.getMinLon() &lt;= maxLon &amp;&amp; debugLine.getMaxLat() &gt;= minLat &amp;&amp; debugLine.getMaxLon() &gt;= minLon)</span>
+<span class="fc" id="L82">            range.add(debugLine);</span>
+<span class="fc" id="L83">    }</span>
+
+    private static void addDebugLineHelper(float[][] lats, float[][] lons, float firstLat, float secondLat, float firstLon, float secondLon) {
+<span class="fc" id="L86">        lats[0][0] = firstLat;</span>
+<span class="fc" id="L87">        lats[0][1] = secondLat;</span>
+<span class="fc" id="L88">        lons[0][0] = firstLon;</span>
+<span class="fc" id="L89">        lons[0][1] = secondLon;</span>
+<span class="fc" id="L90">    }</span>
+
+    public Pointable nearestNeighborSearch(float lon, float lat, boolean xAxis) {
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        if(root.size() == 0) return null;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (root.size() == 1) {</span>
+<span class="fc" id="L95">            return nearestNeighborSearchForNonLeaf(xAxis, lat, lon);</span>
+        }
+        else {
+<span class="fc" id="L98">            return linearSearchOfClosestPointableInLeaf(lon, lat);</span>
+        }
+    }
+
+    private Pointable nearestNeighborSearchForNonLeaf(boolean xAxis, float lat, float lon) {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        float axisCoord =       xAxis ? root.get(0).getMainLon() : root.get(0).getMainLat();</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        float coordVal =        xAxis ? lon : lat;</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        double otherDistance =  xAxis ? Math.abs((root.get(0).getMainLon()) - lon) : Math.abs(root.get(0).getMainLat() - lat);</span>
+
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        KDTree nextTree =  axisCoord &gt; coordVal ? leftChild : rightChild;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        KDTree otherTree = axisCoord &gt; coordVal ? rightChild : leftChild;</span>
+
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (nextTree == null) return root.get(0);</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        Pointable temp = nextTree.nearestNeighborSearch(lon, lat, !xAxis);</span>
+<span class="fc" id="L112">        Pointable closest = compareDistance(temp, root.get(0), lon, lat);</span>
+
+<span class="fc" id="L114">        double bestDistance = getDistance(closest, lon, lat);</span>
+
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if(otherDistance &lt;= bestDistance){</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">            temp = otherTree.nearestNeighborSearch(lon, lat, !xAxis);</span>
+<span class="fc" id="L118">            closest = compareDistance(temp, closest, lon, lat);</span>
+        }
+
+<span class="fc" id="L121">        return closest;</span>
+    }
+
+    private Pointable linearSearchOfClosestPointableInLeaf(float lon, float lat) {
+<span class="fc" id="L125">        Pointable closest = compareDistance(null, root.get(0), lon, lat);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        for (Pointable p: root) {</span>
+<span class="fc" id="L127">            closest = compareDistance(closest, p, lon, lat);</span>
+<span class="fc" id="L128">        }</span>
+<span class="fc" id="L129">        return closest;</span>
+    }
+
+    private Pointable compareDistance(Pointable firstPoint, Pointable secondPoint, float lon, float lat){
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if(firstPoint == null) return secondPoint;</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">        if(secondPoint == null) return firstPoint;</span>
+
+<span class="fc" id="L136">        double distFirstPoint = getDistance(firstPoint, lon, lat);</span>
+<span class="fc" id="L137">        double distSecondPoint = getDistance(secondPoint, lon, lat);</span>
+
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        return distFirstPoint &lt; distSecondPoint ? firstPoint : secondPoint;</span>
+    }
+
+    private double getDistance(Pointable point, float lon, float lat){
+<span class="fc" id="L143">        double aSquared = Math.pow(Math.abs(point.getMainLon()-lon), 2);</span>
+<span class="fc" id="L144">        double bSquared = Math.pow(Math.abs(point.getMainLat()-lat), 2);</span>
+<span class="fc" id="L145">        return aSquared+bSquared;</span>
+    }
+
+    @Override
+    public void addElements(ArrayList&lt;Pointable&gt; elements, boolean xAxis) {
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        if (elements.size() &gt; cutOffValue) {</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">            if (xAxis) elements.sort((first, next) -&gt; Float.compare(first.getMainLon(), next.getMainLon()));</span>
+<span class="fc" id="L152">            else elements.sort((first, next) -&gt; Float.compare(first.getMainLat(), next.getMainLat()));</span>
+
+<span class="fc" id="L154">            int median = elements.size() / 2;</span>
+<span class="fc" id="L155">            root.add(elements.get(median));</span>
+
+<span class="fc" id="L157">            leftChild = new KDTree();</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            leftChild.addElements(new ArrayList&lt;&gt;(elements.subList(0, median)), !xAxis);</span>
+<span class="fc" id="L159">            rightChild = new KDTree();</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            rightChild.addElements(new ArrayList&lt;&gt;(elements.subList(median+1, elements.size())), !xAxis);</span>
+<span class="fc" id="L161">        }</span>
+<span class="fc" id="L162">        else root.addAll(elements);</span>
+<span class="fc" id="L163">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

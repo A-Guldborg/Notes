@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Model.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">Model.java</span></div><h1>Model.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.*;
+import java.util.zip.ZipInputStream;
+
+public class Model {
+    private XMLStreamReader reader;
+
+<span class="fc" id="L15">    static private HashMap&lt;Long, Vertex&gt; allVertices = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L16">    private ArrayList&lt;Pointable&gt; allAddressVertices = new ArrayList&lt;&gt;();</span>
+
+    private SpatialTree spatialTree;
+
+<span class="fc" id="L20">    private final HashMap&lt;Long, OSMElement&gt; relationById = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L21">    private final HashMap&lt;Long, OSMElement&gt; wayById = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L22">    private HashMap&lt;Long, Node&gt; nodesById = new HashMap&lt;&gt;();</span>
+
+    private float minLat, minLon, maxLat, maxLon;
+<span class="fc" id="L25">    private ArrayList&lt;OSMElement&gt; islands = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L26">    private TernarySearchTree addressesTST = new TernarySearchTree();</span>
+<span class="fc" id="L27">    private KDTree vertexTree = null;</span>
+<span class="fc" id="L28">    private KDTree vertexAddressTree = null;</span>
+    private float latLonProportions;
+
+<span class="fc" id="L31">    private Tag currentTag = Tag.UNDEFINED;</span>
+    private long currentId;
+    private LinkedList&lt;LinkedList&lt;Float&gt;&gt; latOfCurrentElement;
+    private LinkedList&lt;LinkedList&lt;Float&gt;&gt; lonOfCurrentElement;
+
+    private ArrayList&lt;Long&gt; nodesOfCurrentWay;
+    private short currentMaxSpeed;
+    private Boolean currentIsCarAllowed;
+    private Boolean currentIsBicycleAllowed;
+    private Boolean currentIsPedestrianAllowed;
+    private String currentName;
+    private boolean isOneWay;
+
+    private Address currentAddress;
+    private boolean isIsland;
+    ArrayList&lt;Pointable&gt; allOSMElements;
+    
+<span class="fc" id="L48">    public Model(InputStream path, String pathName) {</span>
+<span class="fc" id="L49">        spatialTree = new RTree();</span>
+<span class="fc" id="L50">        openFile(path, pathName);</span>
+<span class="fc" id="L51">        calculateLatLonProportions();</span>
+<span class="fc" id="L52">    }</span>
+
+    private void calculateLatLonProportions() {
+<span class="fc" id="L55">        float centerLat = (minLat + maxLat) / 2;</span>
+<span class="fc" id="L56">        float centerLon = (minLon + maxLon) / 2;</span>
+<span class="fc" id="L57">        float latDistance = calculateDistance(centerLon, minLat, centerLon, maxLat);</span>
+<span class="fc" id="L58">        float lonDistance = calculateDistance(minLon, centerLat, maxLon, centerLat);</span>
+<span class="fc" id="L59">        float averageLatDistance = latDistance / (maxLat - minLat);</span>
+<span class="fc" id="L60">        float averageLonDistance = lonDistance / (maxLon - minLon);</span>
+<span class="fc" id="L61">        latLonProportions = averageLonDistance / averageLatDistance;</span>
+<span class="fc" id="L62">    }</span>
+
+    public static float calculateDistance(float fromLon, float fromLat, float toLon, float toLat) {
+<span class="fc" id="L65">        double lonFrom = Math.toRadians(fromLon);</span>
+<span class="fc" id="L66">        double lonTo = Math.toRadians(toLon);</span>
+<span class="fc" id="L67">        double latFrom = Math.toRadians(fromLat);</span>
+<span class="fc" id="L68">        double latTo = Math.toRadians(toLat);</span>
+<span class="fc" id="L69">        double deltaLon = lonTo-lonFrom;</span>
+<span class="fc" id="L70">        double deltaLat = latTo-latFrom;</span>
+<span class="fc" id="L71">        double sidelengthInSphericalTriangle = Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(latFrom) * Math.cos(latTo) * Math.pow(Math.sin(deltaLon / 2),2);</span>
+<span class="fc" id="L72">        double angleOfDistanceInRadians = 2 * Math.asin(Math.sqrt(sidelengthInSphericalTriangle));</span>
+<span class="fc" id="L73">        double radiusOfEarth = 6371; //Radius of earth in km</span>
+<span class="fc" id="L74">        return (float) (angleOfDistanceInRadians*radiusOfEarth);</span>
+    }
+
+    private void createSpatialTree() {
+<span class="fc" id="L78">        spatialTree.addElements(allOSMElements, true);</span>
+<span class="fc" id="L79">    }</span>
+
+    public void changeSpatialTree(boolean useKDTree) {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        spatialTree = useKDTree ? new KDTree() : new RTree();</span>
+<span class="nc" id="L83">        createSpatialTree();</span>
+<span class="nc" id="L84">    }</span>
+    
+    private void openFile(InputStream path, String pathName) {
+        try {
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">            if (pathName.endsWith(&quot;.zip&quot;)) {</span>
+<span class="nc" id="L89">                var zip = new ZipInputStream(path);</span>
+<span class="nc" id="L90">                zip.getNextEntry();</span>
+<span class="nc" id="L91">                loadOSM(zip);</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">            }else if (pathName.endsWith(&quot;.osm&quot;)) {</span>
+<span class="fc" id="L93">                loadOSM(path);</span>
+<span class="fc" id="L94">                createVertexTrees();</span>
+<span class="fc" id="L95">                addressesTST.reduceTree();</span>
+<span class="fc" id="L96">                allOSMElements = new ArrayList&lt;&gt;(relationById.values());</span>
+<span class="fc" id="L97">                allOSMElements.addAll(wayById.values());</span>
+<span class="fc" id="L98">                createSpatialTree();</span>
+<span class="fc" id="L99">                nodesById = null;</span>
+            }
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            else if (pathName.endsWith(&quot;.obj&quot;)) {</span>
+<span class="nc" id="L102">                try (var input = new ObjectInputStream(path)) {</span>
+<span class="nc" id="L103">                    minLat = input.readFloat();</span>
+<span class="nc" id="L104">                    minLon = input.readFloat();</span>
+<span class="nc" id="L105">                    maxLat = input.readFloat();</span>
+<span class="nc" id="L106">                    maxLon = input.readFloat();</span>
+<span class="nc" id="L107">                    addressesTST = (TernarySearchTree) input.readObject();</span>
+<span class="nc" id="L108">                    allVertices = (HashMap&lt;Long, Vertex&gt;) input.readObject();</span>
+<span class="nc" id="L109">                    allAddressVertices = (ArrayList&lt;Pointable&gt;) input.readObject();</span>
+<span class="nc" id="L110">                    allOSMElements = (ArrayList&lt;Pointable&gt;) input.readObject();</span>
+<span class="nc" id="L111">                    isIsland = input.readBoolean();</span>
+<span class="nc" id="L112">                    islands = (ArrayList&lt;OSMElement&gt;) input.readObject();</span>
+<span class="nc" id="L113">                    createSpatialTree();</span>
+<span class="nc" id="L114">                    createVertexTrees();</span>
+<span class="nc" id="L115">                } catch (ClassCastException e) {</span>
+<span class="nc" id="L116">                    System.out.println(&quot;Exception reading objects. Perhaps serialized file is outdated?&quot;);</span>
+<span class="nc" id="L117">                }</span>
+            }
+        }
+<span class="nc" id="L120">        catch (XMLStreamException | IOException | ClassNotFoundException e) {</span>
+<span class="nc" id="L121">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L122">        }</span>
+<span class="fc" id="L123">    }</span>
+
+    public void save(String path) throws IOException {
+<span class="nc" id="L126">        try (var out = new ObjectOutputStream(new FileOutputStream(path))) {</span>
+<span class="nc" id="L127">            out.writeFloat(minLat);</span>
+<span class="nc" id="L128">            out.writeFloat(minLon);</span>
+<span class="nc" id="L129">            out.writeFloat(maxLat);</span>
+<span class="nc" id="L130">            out.writeFloat(maxLon);</span>
+<span class="nc" id="L131">            out.writeObject(addressesTST);</span>
+<span class="nc" id="L132">            out.writeObject(allVertices);</span>
+<span class="nc" id="L133">            out.writeObject(allAddressVertices);</span>
+<span class="nc" id="L134">            out.writeObject(allOSMElements);</span>
+<span class="nc" id="L135">            out.writeBoolean(isIsland);</span>
+<span class="nc" id="L136">            out.writeObject(islands);</span>
+<span class="nc" id="L137">        } catch (IOException e) {</span>
+<span class="nc" id="L138">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L139">        }</span>
+<span class="nc" id="L140">    }</span>
+    
+    private void loadOSM(InputStream inputStream) throws XMLStreamException {
+<span class="fc" id="L143">        reader = XMLInputFactory.newInstance().createXMLStreamReader(new BufferedInputStream(inputStream));</span>
+
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        while(reader.hasNext()){</span>
+<span class="fc bfc" id="L146" title="All 3 branches covered.">            switch (reader.next()){</span>
+                case XMLStreamConstants.START_ELEMENT:
+<span class="fc" id="L148">                    startElement();</span>
+                case XMLStreamConstants.END_ELEMENT:
+<span class="fc" id="L150">                    endElement();</span>
+            }
+        }
+
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        isIsland = !islands.isEmpty();</span>
+<span class="fc" id="L155">        reader.close();</span>
+<span class="fc" id="L156">    }</span>
+
+    private void startElement() {
+<span class="fc bfc" id="L159" title="All 8 branches covered.">        switch(reader.getLocalName()) {</span>
+            case &quot;bounds&quot;:
+<span class="fc" id="L161">                loadBounds();</span>
+<span class="fc" id="L162">                break;</span>
+            case &quot;node&quot;:
+<span class="fc" id="L164">                createNode();</span>
+<span class="fc" id="L165">                break;</span>
+            case &quot;way&quot;:
+<span class="fc" id="L167">                loadWay();</span>
+<span class="fc" id="L168">                break;</span>
+            case &quot;nd&quot;:
+<span class="fc" id="L170">                insertNodeInWay();</span>
+<span class="fc" id="L171">                break;</span>
+            case &quot;relation&quot;:
+<span class="fc" id="L173">                loadRelation();</span>
+<span class="fc" id="L174">                break;</span>
+            case &quot;member&quot;:
+<span class="fc" id="L176">                insertMemberInRelation();</span>
+<span class="fc" id="L177">                break;</span>
+            case &quot;tag&quot;:
+<span class="fc" id="L179">                addTag();</span>
+                break;
+        }
+<span class="fc" id="L182">    }</span>
+
+    private void loadBounds() {
+<span class="fc" id="L185">        minLat = Float.parseFloat(reader.getAttributeValue(null, &quot;minlat&quot;));</span>
+<span class="fc" id="L186">        minLon = Float.parseFloat(reader.getAttributeValue(null, &quot;minlon&quot;));</span>
+<span class="fc" id="L187">        maxLat = Float.parseFloat(reader.getAttributeValue(null, &quot;maxlat&quot;));</span>
+<span class="fc" id="L188">        maxLon = Float.parseFloat(reader.getAttributeValue(null, &quot;maxlon&quot;));</span>
+<span class="fc" id="L189">    }</span>
+
+    private void createNode() {
+<span class="fc" id="L192">        currentName = null;</span>
+<span class="fc" id="L193">        currentId = Long.parseLong(reader.getAttributeValue(null, &quot;id&quot;));</span>
+<span class="fc" id="L194">        float lat = Float.parseFloat(reader.getAttributeValue(null, &quot;lat&quot;));</span>
+<span class="fc" id="L195">        float lon = Float.parseFloat(reader.getAttributeValue(null, &quot;lon&quot;));</span>
+<span class="fc" id="L196">        nodesById.put(currentId, new Node(lat, lon));</span>
+<span class="fc" id="L197">    }</span>
+
+    private void loadWay() {
+<span class="fc" id="L200">        currentName = &quot;Unknown Road&quot;;</span>
+<span class="fc" id="L201">        currentTag = Tag.UNDEFINED;</span>
+<span class="fc" id="L202">        isOneWay = false;</span>
+<span class="fc" id="L203">        latOfCurrentElement = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L204">        lonOfCurrentElement = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L205">        nodesOfCurrentWay = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L206">        currentMaxSpeed = 0;</span>
+<span class="fc" id="L207">        currentIsCarAllowed = null;</span>
+<span class="fc" id="L208">        currentIsBicycleAllowed = null;</span>
+<span class="fc" id="L209">        currentIsPedestrianAllowed = null;</span>
+<span class="fc" id="L210">        latOfCurrentElement.add(new LinkedList&lt;&gt;());</span>
+<span class="fc" id="L211">        lonOfCurrentElement.add(new LinkedList&lt;&gt;());</span>
+<span class="fc" id="L212">        currentId = Long.parseLong(reader.getAttributeValue(null, &quot;id&quot;));</span>
+<span class="fc" id="L213">    }</span>
+
+    private void insertNodeInWay() {
+<span class="fc" id="L216">        Long id = Long.parseLong(reader.getAttributeValue(null, &quot;ref&quot;));</span>
+<span class="fc" id="L217">        Node node = nodesById.get(id);</span>
+<span class="fc" id="L218">        nodesOfCurrentWay.add(id);</span>
+<span class="fc" id="L219">        latOfCurrentElement.get(0).add(node.getMainLat());</span>
+<span class="fc" id="L220">        lonOfCurrentElement.get(0).add(node.getMainLon());</span>
+<span class="fc" id="L221">    }</span>
+
+    private void loadRelation() {
+<span class="fc" id="L224">        currentName = null;</span>
+<span class="fc" id="L225">        latOfCurrentElement = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L226">        lonOfCurrentElement = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L227">        currentTag = Tag.UNDEFINED;</span>
+<span class="fc" id="L228">        currentId = Long.parseLong(reader.getAttributeValue(null, &quot;id&quot;));</span>
+<span class="fc" id="L229">    }</span>
+
+    private void insertMemberInRelation() {
+<span class="fc" id="L232">        long ref = Long.parseLong(reader.getAttributeValue(null, &quot;ref&quot;));</span>
+<span class="fc" id="L233">        String type = reader.getAttributeValue(null, &quot;type&quot;);</span>
+        OSMElement element;
+<span class="fc bfc" id="L235" title="All 2 branches covered.">        if (type.equals(&quot;way&quot;)) {</span>
+<span class="fc" id="L236">            element = wayById.get(ref);</span>
+        }
+        else {
+<span class="fc" id="L239">            element = relationById.get(ref);</span>
+        }
+<span class="fc bfc" id="L241" title="All 2 branches covered.">        if(element == null) return;</span>
+<span class="fc" id="L242">        addMember(arrayToArrayList(element.getLat()), arrayToArrayList(element.getLon()));</span>
+<span class="fc" id="L243">    }</span>
+
+    private void addTag() {
+<span class="fc" id="L246">        String key = reader.getAttributeValue(null, &quot;k&quot;);</span>
+<span class="fc" id="L247">        String value = reader.getAttributeValue(null, &quot;v&quot;);</span>
+<span class="pc bpc" id="L248" title="1 of 4 branches missed.">        if (key.startsWith(&quot;addr:&quot;) &amp;&amp; nodesById.get(currentId) != null) addToAddress(key, value);</span>
+<span class="pc bpc" id="L249" title="1 of 4 branches missed.">        if (key.equals(&quot;wikipedia&quot;) &amp;&amp; currentName != null) insertPlace();</span>
+        try {
+<span class="pc bpc" id="L251" title="1 of 2 branches missed.">            if (key.equals(&quot;maxspeed&quot;)) currentMaxSpeed = Short.parseShort(value);</span>
+<span class="pc" id="L252">        } catch (NumberFormatException ignored) {}</span>
+<span class="pc bpc" id="L253" title="1 of 2 branches missed.">        if (key.equals(&quot;bicycle&quot;)) currentIsBicycleAllowed = isModeOfTransportAllowed(value);</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">        if (key.equals(&quot;foot&quot;)) currentIsPedestrianAllowed = isModeOfTransportAllowed(value);</span>
+<span class="pc bpc" id="L255" title="1 of 4 branches missed.">        if (key.equals(&quot;motorcar&quot;) || key.equals(&quot;motor_vehicle&quot;)) currentIsCarAllowed = isModeOfTransportAllowed(value);</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">        if (currentTag == Tag.UNDEFINED) currentTag = Tag.getTag(key + &quot;_&quot; + value);</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        if(key.equals(&quot;name&quot;)) currentName = reader.getAttributeValue(null, &quot;v&quot;);</span>
+<span class="pc bpc" id="L258" title="3 of 8 branches missed.">        if ((key.equals(&quot;oneway&quot;) &amp;&amp; value.equals(&quot;yes&quot;)) || (key.equals(&quot;junction&quot;) &amp;&amp; value.equals(&quot;roundabout&quot;))) isOneWay = true;</span>
+<span class="fc" id="L259">    }</span>
+
+    private boolean isModeOfTransportAllowed(String value) {
+<span class="fc" id="L262">        return value.equals(&quot;yes&quot;);</span>
+    }
+
+    private void insertPlace() {
+        float lat;
+        float lon;
+<span class="fc bfc" id="L268" title="All 2 branches covered.">        if(nodesById.get(currentId) != null) {</span>
+<span class="fc" id="L269">            lat = nodesById.get(currentId).getMainLat();</span>
+<span class="fc" id="L270">            lon = nodesById.get(currentId).getMainLon();</span>
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">        } else if (latOfCurrentElement != null) {</span>
+<span class="fc" id="L272">            lat = getMainCoord(arrayListToArray(latOfCurrentElement));</span>
+<span class="fc" id="L273">            lon = getMainCoord(arrayListToArray(lonOfCurrentElement));</span>
+        } else {
+<span class="nc" id="L275">            return;</span>
+        }
+<span class="fc" id="L277">        createNewAddress(lat, lon);</span>
+<span class="fc" id="L278">        currentAddress.setCity(currentName);</span>
+<span class="fc" id="L279">        endAddress();</span>
+<span class="fc" id="L280">    }</span>
+
+    private float getMainCoord(float[][] coords) {
+<span class="fc" id="L283">        float min = 100;</span>
+<span class="fc" id="L284">        float max = 0;</span>
+<span class="fc bfc" id="L285" title="All 2 branches covered.">        for (float[] arrayList: coords) {</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">            for (float f: arrayList) {</span>
+<span class="fc bfc" id="L287" title="All 2 branches covered.">                if (f &lt; min) min= f;</span>
+<span class="fc bfc" id="L288" title="All 2 branches covered.">                if (f &gt; max) max = f;</span>
+            }
+        }
+<span class="fc" id="L291">            return min + (max-min)/2;</span>
+    }
+    
+    private void addToAddress(String key, String value) {
+<span class="fc" id="L295">        value = value.intern();</span>
+<span class="fc bfc" id="L296" title="All 5 branches covered.">        switch (key){</span>
+            case &quot;addr:city&quot;:
+<span class="fc" id="L298">                createNewAddress(nodesById.get(currentId).getMainLat(), nodesById.get(currentId).getMainLon());</span>
+<span class="fc" id="L299">                currentAddress.setCity(value);</span>
+<span class="fc" id="L300">                break;</span>
+            case &quot;addr:housenumber&quot;:
+<span class="fc" id="L302">                currentAddress.setHousenumber(value);</span>
+<span class="fc" id="L303">                break;</span>
+            case &quot;addr:postcode&quot;:
+<span class="fc" id="L305">                currentAddress.setPostcode(value);</span>
+<span class="fc" id="L306">                break;</span>
+            case &quot;addr:street&quot;:
+<span class="fc" id="L308">                currentAddress.setStreet(value);</span>
+<span class="fc" id="L309">                endAddress();</span>
+                break;
+        }
+<span class="fc" id="L312">    }</span>
+
+    private void createNewAddress(float lat, float lon) {
+<span class="fc" id="L315">        currentAddress = new Address();</span>
+<span class="fc" id="L316">        currentAddress.setLat(lat);</span>
+<span class="fc" id="L317">        currentAddress.setLon(lon);</span>
+<span class="fc" id="L318">    }</span>
+
+    private void endAddress() {
+<span class="fc" id="L321">        addressesTST.insert(currentAddress);</span>
+<span class="fc" id="L322">        allAddressVertices.add(currentAddress);</span>
+<span class="fc" id="L323">    }</span>
+
+    private void addWayToGraph() {
+<span class="fc" id="L326">        createAndAddVertex(0);</span>
+<span class="fc bfc" id="L327" title="All 2 branches covered.">        for (int i = 1; i &lt; nodesOfCurrentWay.size(); i++) {</span>
+<span class="fc" id="L328">            long id = createAndAddVertex(i);</span>
+<span class="fc" id="L329">            Vertex current = (Vertex) nodesById.get(id);</span>
+<span class="fc" id="L330">            Vertex previous = (Vertex) nodesById.get(nodesOfCurrentWay.get(i-1));</span>
+<span class="fc" id="L331">            updateMaxSpeedAndVehiclesAllowed();</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">            if (!isOneWay)</span>
+<span class="fc" id="L333">                current.addEdge(currentMaxSpeed, nodesOfCurrentWay.get(i-1), currentIsCarAllowed, currentIsBicycleAllowed, currentIsPedestrianAllowed, currentName);</span>
+<span class="fc" id="L334">            previous.addEdge(currentMaxSpeed, id, currentIsCarAllowed, currentIsBicycleAllowed, currentIsPedestrianAllowed, currentName);</span>
+        }
+<span class="fc" id="L336">    }</span>
+
+    private void updateMaxSpeedAndVehiclesAllowed() {
+<span class="fc bfc" id="L339" title="All 2 branches covered.">        if(currentMaxSpeed == 0) currentMaxSpeed = currentTag.getStandardMaxSpeed();</span>
+<span class="fc bfc" id="L340" title="All 2 branches covered.">        if(currentIsCarAllowed == null) currentIsCarAllowed = currentTag.isCarAllowed();</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">        if(currentIsBicycleAllowed == null) currentIsBicycleAllowed = currentTag.isBicycleAllowed();</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">        if(currentIsPedestrianAllowed == null) currentIsPedestrianAllowed = currentTag.isPedestrianAllowed();</span>
+<span class="fc" id="L343">    }</span>
+
+    private long createAndAddVertex(int i) {
+<span class="fc" id="L346">        long id = nodesOfCurrentWay.get(i);</span>
+<span class="fc" id="L347">        Node node = nodesById.get(id);</span>
+<span class="fc bfc" id="L348" title="All 2 branches covered.">        if(!node.isVertex()) {</span>
+<span class="fc" id="L349">            Vertex vertex = new Vertex(node.getMainLat(), node.getMainLon());</span>
+<span class="fc" id="L350">            allVertices.put(id, vertex);</span>
+<span class="fc" id="L351">            nodesById.put(id, vertex);</span>
+        }
+<span class="fc" id="L353">        return id;</span>
+    }
+
+    private void endElement() {
+<span class="fc bfc" id="L357" title="All 3 branches covered.">        switch (reader.getLocalName()){</span>
+            case &quot;way&quot;:
+<span class="fc" id="L359">                endWay();</span>
+<span class="fc" id="L360">                break;</span>
+            case &quot;relation&quot;:
+<span class="fc" id="L362">                endRelation();</span>
+                break;
+        }
+<span class="fc" id="L365">    }</span>
+
+    private void endWay() {
+<span class="fc" id="L368">        boolean isPolygon = currentTag.isPolygon();</span>
+<span class="fc bfc" id="L369" title="All 2 branches covered.">        if (isPolygon) isPolygon = firstPointEqualsLastPoint(lonOfCurrentElement.get(0), latOfCurrentElement.get(0));</span>
+<span class="fc" id="L370">        OSMElement element = new OSMElement(arrayListToArray(latOfCurrentElement), arrayListToArray(lonOfCurrentElement), isPolygon);</span>
+<span class="fc" id="L371">        wayById.put(currentId, element);</span>
+<span class="fc" id="L372">        element.setMainTag(currentTag);</span>
+<span class="pc bpc" id="L373" title="1 of 2 branches missed.">        if (currentTag == Tag.PLACE) islands.add(element);</span>
+<span class="fc bfc" id="L374" title="All 2 branches covered.">        if (currentTag.isRoad()) {</span>
+<span class="fc" id="L375">            addWayToGraph();</span>
+        }
+<span class="fc" id="L377">        currentTag = Tag.UNDEFINED;</span>
+<span class="fc" id="L378">    }</span>
+
+    private void endRelation() {
+<span class="fc" id="L381">        boolean isPolygon = currentTag.isPolygon();</span>
+<span class="fc bfc" id="L382" title="All 2 branches covered.">        if (isArrayNotEmpty(latOfCurrentElement, lonOfCurrentElement)) {</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">            if (isPolygon) isPolygon = isMultiPolygon();</span>
+<span class="fc" id="L384">            OSMElement element = new OSMElement(arrayListToArray(latOfCurrentElement), arrayListToArray(lonOfCurrentElement), isPolygon);</span>
+<span class="fc" id="L385">            relationById.put(currentId, element);</span>
+<span class="fc" id="L386">            element.setMainTag(currentTag);</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">            if (currentTag == Tag.PLACE) islands.add(element);</span>
+<span class="fc" id="L388">            currentTag = Tag.UNDEFINED;</span>
+        }
+<span class="fc" id="L390">    }</span>
+
+    public float getMinLat() {
+<span class="fc" id="L393">        return minLat;</span>
+    }
+    
+    public float getMinLon() {
+<span class="fc" id="L397">        return minLon;</span>
+    }
+    
+    public float getMaxLat() {
+<span class="fc" id="L401">        return maxLat;</span>
+    }
+    
+    public float getMaxLon() {
+<span class="fc" id="L405">        return maxLon;</span>
+    }
+
+    public float getLatLonProportions() {
+<span class="fc" id="L409">        return latLonProportions;</span>
+    }
+
+    public int getVerticesCount(){
+<span class="nc" id="L413">        return allVertices.size();</span>
+    }
+    
+    public HashMap&lt;Tag, ArrayList&lt;OSMElement&gt;&gt; spatialTreeSearchQuery(float[] boundaryBox, int zoomLevel) {
+<span class="nc" id="L417">        HashMap&lt;Tag, ArrayList&lt;OSMElement&gt;&gt; searchResult = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">        for (Tag tag : Tag.values()) {</span>
+<span class="nc" id="L419">            searchResult.put(tag, new ArrayList&lt;&gt;());</span>
+        }
+
+<span class="nc" id="L422">        List&lt;OSMElement&gt; queryElements = spatialTree.searchQuery(boundaryBox[0], boundaryBox[1], boundaryBox[2], boundaryBox[3], zoomLevel);</span>
+        
+<span class="nc bnc" id="L424" title="All 2 branches missed.">        for (OSMElement element : queryElements) {</span>
+<span class="nc" id="L425">            searchResult.get(element.getMainTag()).add(element);</span>
+<span class="nc" id="L426">        }</span>
+<span class="nc" id="L427">        return searchResult;</span>
+    }
+
+    public List&lt;OSMElement&gt; getIslands() {
+<span class="fc" id="L431">        return islands;</span>
+    }
+
+    public Address addressSearch(String input) throws NullPointerException{
+<span class="nc" id="L435">            return addressesTST.getAddress(Address.valueOf(input).toString());</span>
+    }
+    
+    public boolean isIsland(){
+<span class="fc" id="L439">        return isIsland;</span>
+    }
+
+    public HashSet&lt;Address&gt; getAddressSuggestions(String input) {
+<span class="nc" id="L443">        return addressesTST.prefixSearch(input);</span>
+    }
+    
+    private void createVertexTrees(){
+<span class="fc" id="L447">        vertexTree = new KDTree();</span>
+<span class="fc" id="L448">        vertexTree.addElements(new ArrayList&lt;&gt;(allVertices.values()), true);</span>
+<span class="fc" id="L449">        vertexAddressTree = new KDTree();</span>
+<span class="fc" id="L450">        vertexAddressTree.addElements(allAddressVertices, true);</span>
+<span class="fc" id="L451">    }</span>
+    
+    public Pointable getNearestNeighborVertex(float x, float y, Boolean isAddress){
+<span class="nc bnc" id="L454" title="All 2 branches missed.">        if(!isAddress) return vertexTree.nearestNeighborSearch(x, y, true);</span>
+<span class="nc" id="L455">        else return vertexAddressTree.nearestNeighborSearch(x, y, true);</span>
+    }
+
+    static public Vertex getVertexFromId(long id) {
+<span class="fc" id="L459">        return allVertices.get(id);</span>
+    }
+
+    private void addMember(LinkedList&lt;LinkedList&lt;Float&gt;&gt; lat, LinkedList&lt;LinkedList&lt;Float&gt;&gt; lon) {
+<span class="fc bfc" id="L463" title="All 2 branches covered.">        for (int i = 0; i &lt; lat.size(); i++) {</span>
+<span class="fc" id="L464">            latOfCurrentElement.add(lat.get(i));</span>
+<span class="fc" id="L465">            lonOfCurrentElement.add(lon.get(i));</span>
+        }
+<span class="fc" id="L467">    }</span>
+
+    private boolean isMultiPolygon() {
+<span class="fc" id="L470">        LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassignedLat = latOfCurrentElement;</span>
+<span class="fc" id="L471">        LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassignedLon = lonOfCurrentElement;</span>
+<span class="fc" id="L472">        LinkedList&lt;LinkedList&lt;Float&gt;&gt; polygonLat = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L473">        LinkedList&lt;LinkedList&lt;Float&gt;&gt; polygonLon = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L474">        int current = 0;</span>
+
+<span class="fc bfc" id="L476" title="All 2 branches covered.">        while (isArrayNotEmpty(unassignedLat, unassignedLon)) {</span>
+<span class="fc" id="L477">            startNewPolygon(polygonLon, unassignedLon, current);</span>
+<span class="fc" id="L478">            startNewPolygon(polygonLat, unassignedLat, current);</span>
+<span class="pc bpc" id="L479" title="1 of 2 branches missed.">            if (!findWay(polygonLon.get(current), polygonLat.get(current), unassignedLon, unassignedLat)) return false;</span>
+<span class="fc" id="L480">            current++;</span>
+        }
+<span class="fc" id="L482">        latOfCurrentElement = polygonLat;</span>
+<span class="fc" id="L483">        lonOfCurrentElement = polygonLon;</span>
+<span class="fc" id="L484">        return true;</span>
+    }
+
+    private boolean findWay(LinkedList&lt;Float&gt; currentWayLon, LinkedList&lt;Float&gt; currentWayLat,
+                            LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassignedLon, LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassignedLat) {
+<span class="fc bfc" id="L489" title="All 2 branches covered.">        while (!firstPointEqualsLastPoint(currentWayLon, currentWayLat)) {</span>
+<span class="fc" id="L490">            boolean success = false;</span>
+<span class="pc bpc" id="L491" title="1 of 2 branches missed.">            for (int i = 0; i &lt; unassignedLat.size(); i++) {</span>
+<span class="fc" id="L492">                boolean reversed = false;</span>
+<span class="fc bfc" id="L493" title="All 2 branches covered.">                if (didNotFindNextWay(currentWayLon, currentWayLat, unassignedLon, unassignedLat, i)) {</span>
+<span class="fc" id="L494">                    continue;</span>
+                }
+<span class="fc bfc" id="L496" title="All 2 branches covered.">                else if (hasFoundNextWay(unassignedLon, currentWayLon.get(currentWayLon.size()-1), i, true)</span>
+<span class="pc bpc" id="L497" title="1 of 2 branches missed.">                        &amp;&amp; hasFoundNextWay(unassignedLat, currentWayLat.get(currentWayLat.size()-1), i, true)) {</span>
+<span class="fc" id="L498">                    reversed = true;</span>
+                }
+<span class="fc" id="L500">                addWayToPolygon(currentWayLat, unassignedLat, i, reversed);</span>
+<span class="fc" id="L501">                addWayToPolygon(currentWayLon, unassignedLon, i, reversed);</span>
+<span class="fc" id="L502">                success = true;</span>
+<span class="fc" id="L503">                break;</span>
+            }
+<span class="pc bpc" id="L505" title="1 of 2 branches missed.">            if (!success) {</span>
+<span class="nc" id="L506">                return false;</span>
+            }
+<span class="fc" id="L508">        }</span>
+<span class="fc" id="L509">        return true;</span>
+    }
+
+    private boolean didNotFindNextWay(LinkedList&lt;Float&gt; currentWayLon, LinkedList&lt;Float&gt; currentWayLat,
+                                      LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassignedLon, LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassignedLat, int i) {
+<span class="fc bfc" id="L514" title="All 2 branches covered.">        return !((hasFoundNextWay(unassignedLon, currentWayLon.get(currentWayLon.size()-1), i, false)</span>
+<span class="pc bpc" id="L515" title="1 of 2 branches missed.">                &amp;&amp; hasFoundNextWay(unassignedLat, currentWayLat.get(currentWayLat.size()-1), i, false))</span>
+<span class="fc bfc" id="L516" title="All 2 branches covered.">                || (hasFoundNextWay(unassignedLon, currentWayLon.get(currentWayLon.size()-1), i, true)</span>
+<span class="pc bpc" id="L517" title="1 of 2 branches missed.">                &amp;&amp; hasFoundNextWay(unassignedLat, currentWayLat.get(currentWayLat.size()-1), i, true)));</span>
+    }
+
+    private boolean isArrayNotEmpty(LinkedList&lt;LinkedList&lt;Float&gt;&gt; lat, LinkedList&lt;LinkedList&lt;Float&gt;&gt; lon) {
+<span class="pc bpc" id="L521" title="1 of 4 branches missed.">        return lat.size() &gt; 0 &amp;&amp; lon.size() &gt; 0;</span>
+    }
+
+    private boolean hasFoundNextWay(LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassigned,
+                                    Float end, int index, boolean reversed) {
+<span class="fc bfc" id="L526" title="All 2 branches covered.">        if (reversed) return end.equals(unassigned.get(index).get(unassigned.get(index).size()-1));</span>
+<span class="fc" id="L527">        return end.equals(unassigned.get(index).get(0));</span>
+    }
+
+    private boolean firstPointEqualsLastPoint(LinkedList&lt;Float&gt; currentWayLon, LinkedList&lt;Float&gt; currentWayLat) {
+<span class="fc bfc" id="L531" title="All 2 branches covered.">        return currentWayLat.get(0).equals(currentWayLat.get(currentWayLat.size()-1))</span>
+<span class="pc bpc" id="L532" title="1 of 2 branches missed.">                &amp;&amp; currentWayLon.get(0).equals(currentWayLon.get(currentWayLon.size()-1));</span>
+    }
+
+    private void addWayToPolygon(LinkedList&lt;Float&gt; currentWay, LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassigned,
+                                 int index, boolean reverse) {
+<span class="fc bfc" id="L537" title="All 2 branches covered.">        if (reverse) currentWay.addAll(reverse(unassigned.get(index)));</span>
+<span class="fc" id="L538">        else currentWay.addAll(unassigned.get(index));</span>
+<span class="fc" id="L539">        unassigned.remove(index);</span>
+<span class="fc" id="L540">    }</span>
+
+    private void startNewPolygon(LinkedList&lt;LinkedList&lt;Float&gt;&gt; polygon, LinkedList&lt;LinkedList&lt;Float&gt;&gt; unassigned, int current) {
+<span class="fc" id="L543">        polygon.add(new LinkedList&lt;&gt;());</span>
+<span class="fc" id="L544">        polygon.get(current).addAll(unassigned.get(unassigned.size()-1));</span>
+<span class="fc" id="L545">        unassigned.remove(unassigned.size()-1);</span>
+<span class="fc" id="L546">    }</span>
+
+    private LinkedList&lt;Float&gt; reverse(LinkedList&lt;Float&gt; toBeReversed) {
+<span class="fc" id="L549">        LinkedList&lt;Float&gt; reversedArray = new LinkedList&lt;&gt;();</span>
+<span class="fc bfc" id="L550" title="All 2 branches covered.">        for (int i = toBeReversed.size()-1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L551">            reversedArray.add(toBeReversed.get(i));</span>
+        }
+<span class="fc" id="L553">        return reversedArray;</span>
+    }
+
+    private float[][] arrayListToArray(LinkedList&lt;LinkedList&lt;Float&gt;&gt; arrayList) {
+<span class="fc" id="L557">        float[][] array = new float[arrayList.size()][];</span>
+
+<span class="fc bfc" id="L559" title="All 2 branches covered.">        for (int i = 0; i &lt; arrayList.size(); i++) {</span>
+<span class="fc" id="L560">            array[i] = new float[arrayList.get(i).size()];</span>
+<span class="fc bfc" id="L561" title="All 2 branches covered.">            for (int j = 0; j &lt; arrayList.get(i).size(); j++) {</span>
+<span class="fc" id="L562">                array[i][j] = arrayList.get(i).get(j);</span>
+            }
+        }
+<span class="fc" id="L565">        return array;</span>
+    }
+
+    private LinkedList&lt;LinkedList&lt;Float&gt;&gt; arrayToArrayList(float[][] array) {
+<span class="fc" id="L569">        LinkedList&lt;LinkedList&lt;Float&gt;&gt; arrayList = new LinkedList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L571" title="All 2 branches covered.">        for (int i = 0; i &lt; array.length; i++) {</span>
+<span class="fc" id="L572">            arrayList.add(new LinkedList&lt;&gt;());</span>
+<span class="fc bfc" id="L573" title="All 2 branches covered.">            for (int j = 0; j &lt; array[i].length; j++) {</span>
+<span class="fc" id="L574">                arrayList.get(i).add(array[i][j]);</span>
+            }
+        }
+<span class="fc" id="L577">        return arrayList;</span>
+    }
+
+    public void addAddress(Address poiAddress) {
+<span class="nc" id="L581">        addressesTST.insert(poiAddress);</span>
+<span class="nc" id="L582">    }</span>
+
+    public static void setAllVertices(HashMap&lt;Long, Vertex&gt; allVertices) {
+<span class="fc" id="L585">        Model.allVertices = allVertices;</span>
+<span class="fc" id="L586">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

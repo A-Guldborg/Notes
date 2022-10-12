@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="BFST22Group10.Models.ModelTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2022-05-11T20:06:55" hostname="Andreass-MacBook-Air-4.local" time="5.326">
+  <properties/>
+  <testcase name="IsIsland()" classname="BFST22Group10.Models.ModelTest" time="1.848"/>
+  <testcase name="getLatLonProportions()" classname="BFST22Group10.Models.ModelTest" time="1.01"/>
+  <testcase name="getIsland()" classname="BFST22Group10.Models.ModelTest" time="0.61"/>
+  <testcase name="getMaxLat()" classname="BFST22Group10.Models.ModelTest" time="0.658"/>
+  <testcase name="getMaxLon()" classname="BFST22Group10.Models.ModelTest" time="0.476"/>
+  <testcase name="getMinLat()" classname="BFST22Group10.Models.ModelTest" time="0.389"/>
+  <testcase name="getMinLon()" classname="BFST22Group10.Models.ModelTest" time="0.327"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

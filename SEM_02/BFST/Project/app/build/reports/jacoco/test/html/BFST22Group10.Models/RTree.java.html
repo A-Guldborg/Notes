@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">RTree.java</span></div><h1>RTree.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.PriorityQueue;
+
+public class RTree implements SpatialTree, Serializable {
+    public static final long serialVersionUID = 32;
+    private final static int pqCapacity = 256;
+    private final static int treeCapacity = 16;
+<span class="fc" id="L13">    static int counter = 0;</span>
+
+    private final PriorityQueue&lt;OSMElement&gt; elements;
+    private RTree[] subtrees;
+    private float minLat, maxLat, minLon, maxLon;
+
+    static private List&lt;OSMElement&gt; returnList;
+    private static HashMap&lt;Integer, RTree&gt; treesByZoomLevel;
+    private static List&lt;Integer&gt; zoomLevels;
+
+<span class="fc" id="L23">    public RTree() {</span>
+<span class="fc" id="L24">        elements = new PriorityQueue&lt;&gt;();</span>
+<span class="fc" id="L25">    }</span>
+
+    private void addElement(OSMElement element) {
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (elements.size() == 0) {</span>
+<span class="fc" id="L29">            minLat = element.getMinLat();</span>
+<span class="fc" id="L30">            maxLat = element.getMaxLat();</span>
+<span class="fc" id="L31">            minLon = element.getMinLon();</span>
+<span class="fc" id="L32">            maxLon = element.getMaxLon();</span>
+        } else {
+<span class="fc" id="L34">            minLat = Math.min(minLat, element.getMinLat());</span>
+<span class="fc" id="L35">            maxLat = Math.max(maxLat, element.getMaxLat());</span>
+<span class="fc" id="L36">            minLon = Math.min(minLon, element.getMinLon());</span>
+<span class="fc" id="L37">            maxLon = Math.max(maxLon, element.getMaxLon());</span>
+        }
+
+<span class="fc" id="L40">        elements.offer(element);</span>
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (elements.size() &gt; pqCapacity) {</span>
+<span class="fc" id="L43">            OSMElement smallestElement = elements.poll();</span>
+<span class="fc" id="L44">            addElementToSubtree(smallestElement);</span>
+        }
+<span class="fc" id="L46">    }</span>
+
+    private void addElementToSubtree(OSMElement element) {
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (subtrees == null) createSubtrees();</span>
+
+<span class="fc" id="L51">        RTree smallestNewRTree = subtrees[0];</span>
+<span class="fc" id="L52">        float smallestBoundingBox = subtrees[0].getBoundingBoxChange(element);</span>
+
+<span class="fc" id="L54">        checkIfBoundingBoxContainElement(element, smallestNewRTree, smallestBoundingBox);</span>
+<span class="fc" id="L55">    }</span>
+
+    private void checkIfBoundingBoxContainElement(OSMElement element, RTree smallestNewRTree, float smallestBoundingBox) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        for (RTree subtree : subtrees) {</span>
+<span class="fc bfc" id="L59" title="All 4 branches covered.">            if (subtree.getBoundingBox() == 0.0 || subtree.getBoundingBoxChange(element) == 0.0) {</span>
+<span class="fc" id="L60">                smallestNewRTree = subtree;</span>
+<span class="fc" id="L61">                break;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            } else if (subtree.getBoundingBoxChange(element) &lt; smallestBoundingBox) {</span>
+<span class="fc" id="L63">                smallestBoundingBox = subtree.getBoundingBoxChange(element);</span>
+<span class="fc" id="L64">                smallestNewRTree = subtree;</span>
+            }
+        }
+<span class="fc" id="L67">        smallestNewRTree.addElement(element);</span>
+<span class="fc" id="L68">    }</span>
+
+    private float getBoundingBoxChange(OSMElement newElement) {
+<span class="fc" id="L71">        float minLat = Math.min(this.minLat, newElement.getMinLat());</span>
+<span class="fc" id="L72">        float maxLat = Math.max(this.maxLat, newElement.getMaxLat());</span>
+<span class="fc" id="L73">        float minLon = Math.min(this.minLon, newElement.getMinLon());</span>
+<span class="fc" id="L74">        float maxLon = Math.max(this.maxLon, newElement.getMaxLon());</span>
+<span class="fc" id="L75">        return (maxLat - minLat) * (maxLon - minLon) - getBoundingBox();</span>
+    }
+
+    private float getBoundingBox() {
+<span class="fc" id="L79">        return (this.maxLat - this.minLat) * (this.maxLon - this.minLon);</span>
+    }
+
+    private void createSubtrees() {
+<span class="fc" id="L83">        subtrees = new RTree[treeCapacity];</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        for (int i = 0; i &lt; treeCapacity; i++) {</span>
+<span class="fc" id="L85">            subtrees[i] = new RTree();</span>
+        }
+<span class="fc" id="L87">    }</span>
+
+    @Override
+    public void addElements(ArrayList&lt;Pointable&gt; elements, boolean axis) {
+<span class="fc" id="L91">        treesByZoomLevel = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L92">        zoomLevels = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        for (Tag t : Tag.values()) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            if (null == treesByZoomLevel.putIfAbsent(t.getRequiredZoomLevel(), new RTree())) {</span>
+<span class="fc" id="L95">                zoomLevels.add(t.getRequiredZoomLevel());</span>
+            }
+        }
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (Pointable element : elements) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            if(((OSMElement) element).getMainTag() == Tag.UNDEFINED) continue;</span>
+<span class="fc" id="L100">            treesByZoomLevel.get(((OSMElement) element).getMainTag().getRequiredZoomLevel()).addElement((OSMElement) element);</span>
+<span class="fc" id="L101">        }</span>
+<span class="fc" id="L102">    }</span>
+
+    @Override
+    public List&lt;OSMElement&gt; searchQuery(float queryMinLat, float queryMaxLat, float queryMinLon, float queryMaxLon, int zoomLevel) {
+<span class="fc" id="L106">        returnList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        for (Integer zoom : zoomLevels) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            if (zoom &gt; zoomLevel) continue;</span>
+<span class="fc" id="L109">            treesByZoomLevel.get(zoom).search(queryMinLat, queryMaxLat, queryMinLon, queryMaxLon);</span>
+<span class="fc" id="L110">        }</span>
+<span class="fc" id="L111">        return returnList;</span>
+    }
+
+    private void search(float queryMinLat, float queryMaxLat, float queryMinLon, float queryMaxLon) {
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (boxesOverlap(queryMinLat, queryMaxLat, queryMinLon, queryMaxLon, this.minLat, this.maxLat, this.minLon, this.maxLon)) {</span>
+<span class="fc" id="L116">            float[][] lats = new float[][]{{minLat, maxLat, maxLat, minLat, minLat}};</span>
+<span class="fc" id="L117">            float[][] lons = new float[][]{{minLon, minLon, maxLon, maxLon, minLon}};</span>
+
+<span class="fc" id="L119">            OSMElement debugBox = new OSMElement(lats, lons, false);</span>
+<span class="fc" id="L120">            debugBox.setMainTag(Tag.DEBUG);</span>
+<span class="fc" id="L121">            returnList.add(debugBox);</span>
+
+<span class="fc" id="L123">            getElementsIfContained(queryMinLat, queryMaxLat, queryMinLon, queryMaxLon);</span>
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">            if (subtrees == null) return;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            for (RTree subtree : subtrees) {</span>
+<span class="fc" id="L127">                subtree.search(queryMinLat, queryMaxLat, queryMinLon, queryMaxLon);</span>
+            }
+        }
+<span class="fc" id="L130">    }</span>
+
+    private void getElementsIfContained(float queryMinLat, float queryMaxLat, float queryMinLon, float queryMaxLon) {
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        for (OSMElement element : elements) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">            if (boxesOverlap(queryMinLat, queryMaxLat, queryMinLon, queryMaxLon, element.getMinLat(), element.getMaxLat(), element.getMinLon(), element.getMaxLon())) {</span>
+<span class="fc" id="L135">                returnList.add(element);</span>
+<span class="fc" id="L136">                counter++;</span>
+            }
+<span class="fc" id="L138">        }</span>
+<span class="fc" id="L139">    }</span>
+
+    private static boolean coordinatesOverlap(float firstMin, float firstMax, float secondMin, float secondMax) {
+<span class="pc bpc" id="L142" title="3 of 12 branches missed.">        return (firstMin &gt; secondMin &amp;&amp; firstMin &lt; secondMax) || (firstMax &gt; secondMin &amp;&amp; firstMax &lt; secondMax) || (secondMin &gt; firstMin &amp;&amp; secondMin &lt; firstMax);</span>
+    }
+
+    private static boolean boxesOverlap(float firstMinLat, float firstMaxLat, float firstMinLon, float firstMaxLon, float secondMinLat, float secondMaxLat, float secondMinLon, float secondMaxLon) {
+<span class="fc" id="L146">        boolean latOverlaps = coordinatesOverlap(firstMinLat, firstMaxLat, secondMinLat, secondMaxLat);</span>
+
+<span class="fc" id="L148">        boolean lonOverlaps = coordinatesOverlap(firstMinLon, firstMaxLon, secondMinLon, secondMaxLon);</span>
+
+<span class="fc bfc" id="L150" title="All 4 branches covered.">        return (latOverlaps &amp;&amp; lonOverlaps);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

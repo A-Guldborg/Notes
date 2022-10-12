@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="209.0" prefWidth="140.0" style="-fx-background-color: green;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.exam.chillhub.controllers.MediaController">
+    <ImageView fx:id="poster" fitHeight="209.0" fitWidth="140.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+    </ImageView>
+   <Label fx:id="title" layoutX="74.0" layoutY="303.0" text="title" textFill="WHITE" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="24.0" AnchorPane.rightAnchor="24.0">
+      <font>
+         <Font size="18.0" />
+      </font>
+   </Label>
+   <Button fx:id="playBtn" layoutX="24.0" layoutY="378.0" mnemonicParsing="false" text="Play" AnchorPane.bottomAnchor="14.399999999999977" AnchorPane.leftAnchor="24.0" />
+   <Button fx:id="favoriteBtn" layoutX="68.0" layoutY="378.0" mnemonicParsing="false" text="Favorite" AnchorPane.bottomAnchor="14.399999999999977" AnchorPane.leftAnchor="68.0" />
+</AnchorPane>

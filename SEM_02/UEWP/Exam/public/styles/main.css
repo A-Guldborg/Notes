@@ -1,0 +1,127 @@
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --white: #FFFFFF;
+    --green: #34CC27BF;
+    --black: #000000;
+    --grey: #979797;
+    --lightbrown: #F0ECEC;
+    --red: #EF6767;
+    --cyan: #59B3D0;
+    --smallfont: 20px;
+    --mediumfont: 24px;
+    --largefont: 32px;
+}
+
+#menubar {
+    background-color: var(--lightbrown);
+    margin: auto;
+    border-radius: 25px;
+    height: 84px;
+    width: 90%;
+    max-width: 400px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#menubar-container {
+    width: 100%;
+    position: fixed;
+    bottom: 10px;
+}
+
+.menuitem {
+    width: 64px;
+    height: 64px;
+    border-radius: 25px;
+    border-color: var(--black);
+    background-color: var(--white);
+    text-align: center;
+
+    display: flex;
+    align-content: center;
+
+}
+
+.menuitem > a {
+    margin: auto;
+}
+
+#back-button {
+    background: #FFFFFF00;
+    height: 50px;
+    width: 50px;
+    position: fixed;
+    top: 27px;
+    left: 27px;
+    border: 2px solid black;
+    border-radius: 25px;
+}
+
+h2 {
+    color: var(--green);
+    font-style: italic;
+    text-align: center;
+}
+
+.box {
+    border-radius: 10px;
+    border-color: var(--green);
+    border-style: solid;
+    border-width: 3px;
+    padding: 10px;
+    margin: auto;
+    margin-bottom: 25px;
+    margin-top: 5px;
+    width: 80%;
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.button-container {
+    text-align: center;
+}
+
+.button {
+    stroke: 2px solid var(--green);
+    border-radius: 35px;
+    color: var(--green);
+    background-color: var(--white);
+    text-align: center;
+    border: 0px;
+    height: 70px;
+    width: 228px;
+    margin-top: 20px;
+    font-size: var(--smallfont);
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.filled {
+    background-color: var(--green);
+    color: var(--white);
+}
+
+.menuitem .material-icons {
+    font-size: 3em;
+    color: var(--black);
+}
+
+#greenMapContainer{
+    align-content: center;
+    width: 100%;
+    position: fixed;
+    top: -200px;
+}
+
+#greenMap{
+    position: absolute;
+    width: 100%;
+    max-height: 400px;
+}

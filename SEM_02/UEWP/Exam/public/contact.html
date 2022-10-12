@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rideit</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/contact.css">
+</head>
+<body>
+<!-- Following section creates the menubar -->
+<div id="menubar-container">
+    <div id="menubar">
+        <div class="menuitem">
+            <a href="index.html">
+                <span class="material-icons">home</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="profile.html">
+                <span class="material-icons">account_circle</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="help.html">
+                <span class="material-icons">help</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="contact.html">
+                <span class="material-icons">textsms</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Following section creates the back-button -->
+<button id="back-button" onclick="history.back()">
+    <span class="material-icons">arrow_back</span>
+</button>
+
+<div id="main">
+    <h2>Contact us</h2>
+    <label for="form-name">FULL NAME</label>
+    <input class="box" type="text" id="form-name" name="name">
+    <label for="form-mail">E-MAIL</label>
+    <input class="box" type="text" id="form-mail" name="mail">
+    <label for="form-message">MESSAGE</label>
+    <textarea class="box" id="form-message"></textarea>
+    <div class="button-container">
+        <button class="button filled">SEND</button>
+    </div>
+</div>
+</body>
+</html>

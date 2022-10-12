@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PathFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">PathFinder.java</span></div><h1>PathFinder.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import java.util.*;
+
+public class PathFinder {
+    private final ArrayList&lt;Vertex&gt; pathToLegalRoad;
+    private final ArrayList&lt;Vertex&gt; mainPath;
+    private ArrayList&lt;Vertex&gt; legalPathToDestination;
+<span class="fc" id="L9">    private final ArrayList&lt;float[]&gt; visitedEdgesLats = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L10">    private final ArrayList&lt;float[]&gt; visitedEdgesLons = new ArrayList&lt;&gt;();</span>
+    private ArrayList&lt;String&gt; routeDescription;
+    private Vertex endPoint;
+
+<span class="fc" id="L14">    public PathFinder(Vertex source, Vertex destination, ModeOfTransport modeOfTransport, int amountOfVertices, boolean hasTrailer){</span>
+<span class="fc" id="L15">        pathToLegalRoad = createPath(source, destination, modeOfTransport, amountOfVertices, false);</span>
+<span class="fc" id="L16">        legalPathToDestination = createPath(destination, source, modeOfTransport, amountOfVertices, false);</span>
+<span class="fc" id="L17">        mainPath = createPath(getEnd(pathToLegalRoad), getEnd(legalPathToDestination), modeOfTransport, amountOfVertices, true);</span>
+<span class="fc" id="L18">        legalPathToDestination = revertList(legalPathToDestination);</span>
+<span class="fc" id="L19">        generateRouteDescription(mainPath, modeOfTransport, hasTrailer);</span>
+<span class="fc" id="L20">    }</span>
+
+    private Vertex getEnd(ArrayList&lt;Vertex&gt; path) {
+<span class="fc" id="L23">        return path.get(path.size()-1);</span>
+    }
+
+    private ArrayList&lt;Vertex&gt; createPath(Vertex source, Vertex destination, ModeOfTransport modeOfTransport, int amountOfVertices, boolean lookingForDestination) {
+<span class="fc" id="L27">        HashMap&lt;Vertex, Vertex&gt; shortestPathTree = shortestPathTree(source, destination, modeOfTransport, amountOfVertices, lookingForDestination);</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (lookingForDestination) {</span>
+<span class="fc" id="L29">            return pathToDestination(shortestPathTree, destination);</span>
+        }
+<span class="fc" id="L31">        return pathToDestination(shortestPathTree, endPoint);</span>
+    }
+
+
+    public ArrayList&lt;float[]&gt; getVisitedEdgesLats() {
+<span class="fc" id="L36">        return visitedEdgesLats;</span>
+    }
+
+    public ArrayList&lt;float[]&gt; getVisitedEdgesLons() {
+<span class="fc" id="L40">        return visitedEdgesLons;</span>
+    }
+
+    public ArrayList&lt;String&gt; getRouteDescription() {
+<span class="fc" id="L44">        return routeDescription;</span>
+    }
+    
+    private HashMap&lt;Vertex, Vertex&gt; shortestPathTree(Vertex source, Vertex destination, ModeOfTransport modeOfTransport, int amountOfVertices, boolean lookingForDestination){
+        // Initialize data structures
+<span class="fc" id="L49">        HashSet&lt;Vertex&gt; removeTheseVertices = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L50">        HashSet&lt;Vertex&gt; visitedVertices = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L51">        HashMap&lt;Vertex, Vertex&gt; shortestPathTree = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L52">        IndexMinPQ&lt;Vertex&gt; indexMinPQ = new IndexMinPQ&lt;&gt;(amountOfVertices);</span>
+
+        // Populate first entry of PQ
+<span class="fc" id="L55">        int indexCounter = 1;</span>
+<span class="fc" id="L56">        source.setIndex(indexCounter++);</span>
+<span class="fc" id="L57">        removeTheseVertices.add(source);</span>
+<span class="fc" id="L58">        removeTheseVertices.add(destination);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if(lookingForDestination) {</span>
+<span class="fc" id="L60">            source.setDistToDestination(destination, modeOfTransport);</span>
+        }
+<span class="fc" id="L62">        indexMinPQ.insert(source.getIndex(), source);</span>
+
+        pathSearching:
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        while(!indexMinPQ.isEmpty()){</span>
+<span class="fc" id="L66">            Vertex vertexFrom = indexMinPQ.minKey();</span>
+<span class="fc" id="L67">            indexMinPQ.delMin();</span>
+<span class="fc" id="L68">            visitedVertices.add(vertexFrom);</span>
+<span class="fc" id="L69">            removeTheseVertices.add(vertexFrom);</span>
+<span class="fc" id="L70">            List&lt;Edge&gt; neighbors = vertexFrom.getNeighbors();</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">            if (neighbors == null) continue;</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            for (Edge edge : vertexFrom.getNeighbors()) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                if(endPointFound(vertexFrom, edge, lookingForDestination, destination, modeOfTransport)){</span>
+<span class="fc" id="L74">                    this.endPoint = vertexFrom;</span>
+<span class="fc" id="L75">                    break pathSearching;</span>
+                }
+
+<span class="fc" id="L78">                Vertex vertexTo = Model.getVertexFromId(edge.getTo());</span>
+<span class="fc" id="L79">                removeTheseVertices.add(vertexTo);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">                if(lookingForDestination){</span>
+<span class="fc" id="L81">                    vertexTo.setDistToDestination(destination, modeOfTransport);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">                    if(!edge.isTransportModeAllowed(modeOfTransport)) continue;</span>
+                }
+<span class="fc" id="L84">                visitedEdgesLats.add(new float[]{vertexFrom.getMainLat(), vertexTo.getMainLat()});</span>
+<span class="fc" id="L85">                visitedEdgesLons.add(new float[]{vertexFrom.getMainLon(), vertexTo.getMainLon()});</span>
+
+<span class="pc bpc" id="L87" title="3 of 4 branches missed.">                if(!visitedVertices.contains(vertexTo) || vertexTo.getDistToSource() &gt; vertexFrom.getDistToSource() + edge.getDistance(modeOfTransport)) {</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">                    float newDist = lookingForDestination ? vertexFrom.getDistToSource() + edge.getDistance(modeOfTransport) :</span>
+<span class="fc" id="L89">                            vertexFrom.getDistToSource() + edge.getDistance(ModeOfTransport.WALK);</span>
+<span class="fc" id="L90">                    vertexTo.setDistToSource(newDist);</span>
+<span class="fc" id="L91">                    shortestPathTree.put(vertexTo, vertexFrom);</span>
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">                    if (indexMinPQ.contains(vertexTo.getIndex())){</span>
+<span class="nc" id="L94">                        indexMinPQ.changeKey(vertexTo.getIndex(), vertexTo);</span>
+<span class="nc" id="L95">                        continue;</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">                    } else if (vertexTo.getIndex() &lt;= 0) {</span>
+<span class="fc" id="L97">                        vertexTo.setIndex(indexCounter++);</span>
+                    }
+<span class="fc" id="L99">                    indexMinPQ.insert(vertexTo.getIndex(), vertexTo);</span>
+                }
+<span class="fc" id="L101">            }</span>
+<span class="fc" id="L102">        }</span>
+
+        // Cleanup
+<span class="fc" id="L105">        removeTheseVertices.forEach(this::resetVertex);</span>
+<span class="fc" id="L106">        shortestPathTree.forEach(this::resetVertex);</span>
+<span class="fc" id="L107">        visitedVertices.forEach(this::resetVertex);</span>
+<span class="fc" id="L108">        resetVertex(destination);</span>
+<span class="fc" id="L109">        return shortestPathTree;</span>
+    }
+    
+    private boolean endPointFound(Vertex source, Edge edge, boolean lookingForDestination, Vertex destination, ModeOfTransport modeOfTransport){
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if(lookingForDestination){</span>
+<span class="fc" id="L114">            return source.equals(destination);</span>
+        } else {
+<span class="fc" id="L116">            return edge.isTransportModeAllowed(modeOfTransport);</span>
+        }
+    }
+
+    private ArrayList&lt;Vertex&gt; pathToDestination(HashMap&lt;Vertex, Vertex&gt; shortestPathTree, Vertex destination){
+<span class="fc" id="L121">        ArrayList&lt;Vertex&gt; path = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L122">        Vertex current = destination;</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        while(current != null){</span>
+<span class="fc" id="L124">            path.add(current);</span>
+<span class="fc" id="L125">            current = shortestPathTree.get(current);</span>
+        }
+<span class="fc" id="L127">        return revertList(path);</span>
+    }
+
+    private ArrayList&lt;Vertex&gt; revertList(ArrayList&lt;Vertex&gt; original) {
+<span class="fc" id="L131">        ArrayList&lt;Vertex&gt; returnList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for (int i = original.size()-1; i &gt;= 0; i--) {</span>
+<span class="fc" id="L133">            returnList.add(original.get(i));</span>
+        }
+<span class="fc" id="L135">        return returnList;</span>
+    }
+    
+    private void resetVertex(Vertex ...value) {
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        for (Vertex v : value){</span>
+<span class="fc" id="L140">            v.setDistToSource(0f);</span>
+<span class="fc" id="L141">            v.setDistToDestination(0f);</span>
+<span class="fc" id="L142">            v.setIndex(0);</span>
+        }
+<span class="fc" id="L144">    }</span>
+
+    private void generateRouteDescription(ArrayList&lt;Vertex&gt; shortestPath, ModeOfTransport modeOfTransport, boolean hasTrailer) {
+<span class="fc" id="L147">        Iterator&lt;Vertex&gt; iterator = shortestPath.iterator();</span>
+<span class="fc" id="L148">        ArrayList&lt;RoadSegment&gt; segments = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L149">        Vertex previous = null;</span>
+<span class="fc" id="L150">        Vertex current = iterator.next();</span>
+        Vertex nextInPath;
+<span class="fc" id="L152">        RoadSegment segment = null;</span>
+<span class="fc" id="L153">        float totalDuration = 0f;</span>
+    
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        while(iterator.hasNext()){</span>
+<span class="fc" id="L156">            nextInPath = iterator.next();</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">            for (Edge edge : current.getNeighbors()) {</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">                if(Model.getVertexFromId(edge.getTo()).equals(nextInPath)){</span>
+<span class="fc bfc" id="L159" title="All 4 branches covered.">                    if(segment == null || !segment.getStreetName().equals(edge.getStreetName())){</span>
+<span class="fc" id="L160">                        segment = new RoadSegment(edge.getStreetName(), modeOfTransport);</span>
+<span class="fc" id="L161">                        segments.add(segment);</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">                        if (previous != null)</span>
+<span class="fc" id="L163">                            segment.setTurn(previous, current, nextInPath);</span>
+<span class="fc" id="L164">                        totalDuration += 0.001f;</span>
+                    }
+<span class="fc" id="L166">                    segment.addDistance(edge.getDistance());</span>
+<span class="fc" id="L167">                    totalDuration += calculateDurationOfEdge(modeOfTransport, edge, hasTrailer);</span>
+<span class="fc" id="L168">                    break;</span>
+                }
+<span class="nc" id="L170">            }</span>
+<span class="fc" id="L171">            previous = current;</span>
+<span class="fc" id="L172">            current = nextInPath;</span>
+        }
+
+<span class="fc" id="L175">        routeDescription = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">        for (RoadSegment segmentInPath : segments) {</span>
+<span class="fc" id="L177">            routeDescription.add(segmentInPath.toString());</span>
+<span class="fc" id="L178">        }</span>
+<span class="fc" id="L179">        routeDescription.add(&quot;The trip will take &quot; + timeString(totalDuration));</span>
+<span class="fc" id="L180">    }</span>
+
+    private float calculateDurationOfEdge(ModeOfTransport modeOfTransport, Edge edge, boolean hasTrailer) {
+<span class="fc" id="L183">        float distance = edge.getDistance();</span>
+<span class="fc" id="L184">        float speedLimit = edge.getSpeedLimit();</span>
+<span class="pc bpc" id="L185" title="3 of 4 branches missed.">        if(hasTrailer &amp;&amp; speedLimit &gt; 80) speedLimit = 80;</span>
+<span class="pc bpc" id="L186" title="2 of 3 branches missed.">        switch (modeOfTransport) {</span>
+            case CAR:
+<span class="fc" id="L188">                return distance / speedLimit;</span>
+            case BICYCLE:
+<span class="nc" id="L190">                return distance / 20f;</span>
+        }
+<span class="nc" id="L192">        return distance / 5f;</span>
+    }
+
+    private String timeString(float time) {
+<span class="fc" id="L196">        int hours = (int) time;</span>
+<span class="fc" id="L197">        int minutes = (int) (60 * (time-hours));</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if(hours &lt; 1) {</span>
+<span class="fc" id="L199">            return minutes + &quot; minutes&quot;;</span>
+        } else {
+<span class="fc" id="L201">            return hours + &quot; hours and &quot; + minutes + &quot; minutes&quot;;</span>
+        }
+    }
+
+    public ArrayList&lt;Vertex&gt; getFullPath() {
+<span class="fc" id="L206">        ArrayList&lt;Vertex&gt; returnList = new ArrayList&lt;&gt;(pathToLegalRoad);</span>
+<span class="fc" id="L207">        returnList.addAll(mainPath);</span>
+<span class="fc" id="L208">        returnList.addAll(legalPathToDestination);</span>
+<span class="fc" id="L209">        return returnList;</span>
+
+    }
+
+    private static class RoadSegment {
+        private final String streetName;
+        private float distance;
+<span class="fc" id="L216">        private String turn = null;</span>
+        private final ModeOfTransport modeOfTransport;
+        
+<span class="fc" id="L219">        public RoadSegment(String streetName, ModeOfTransport modeOfTransport) {</span>
+<span class="fc" id="L220">            this.streetName = streetName.intern();</span>
+<span class="fc" id="L221">            this.modeOfTransport = modeOfTransport;</span>
+<span class="fc" id="L222">        }</span>
+    
+        public String getStreetName() {
+<span class="fc" id="L225">            return streetName;</span>
+        }
+        
+        public void addDistance(float distance){
+<span class="fc" id="L229">            this.distance += distance;</span>
+<span class="fc" id="L230">        }</span>
+        
+        public int getDistance(){
+<span class="fc" id="L233">            return Math.round(distance * 1000);</span>
+        }
+        
+        public void setTurn(Vertex previous, Vertex current, Vertex nextInPath) {
+<span class="fc" id="L237">            float a1 = current.getMainLon() - previous.getMainLon();</span>
+<span class="fc" id="L238">            float a2 = current.getMainLat() - previous.getMainLat();</span>
+<span class="fc" id="L239">            float b1 = nextInPath.getMainLon() - current.getMainLon();</span>
+<span class="fc" id="L240">            float b2 = nextInPath.getMainLat() - current.getMainLat();</span>
+<span class="fc" id="L241">            float angle = (float) (180f / Math.PI * (Math.atan2(b1, b2) - Math.atan2(a1, a2)));</span>
+            
+<span class="pc bpc" id="L243" title="1 of 4 branches missed.">            if(angle &lt; 30 &amp;&amp; angle &gt; -30) {</span>
+<span class="nc" id="L244">                turn = &quot;forward&quot;;</span>
+<span class="pc bpc" id="L245" title="4 of 8 branches missed.">            } else if ((angle &lt; -30 &amp;&amp; angle &gt; -150) || (angle &gt; 210 &amp;&amp; angle &lt; 330)){</span>
+<span class="fc" id="L246">                turn = &quot;left&quot;;</span>
+<span class="pc bpc" id="L247" title="6 of 8 branches missed.">            } else if ((angle &gt; 30 &amp;&amp; angle &lt; 150) || (angle &lt; -210 &amp;&amp; angle &gt; -330)){</span>
+<span class="fc" id="L248">                turn = &quot;right&quot;;</span>
+            } else {
+<span class="nc" id="L250">                turn = &quot;forward&quot;;</span>
+            }
+<span class="fc" id="L252">        }</span>
+        
+        @Override
+        public String toString(){
+            String keyWord;
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">            if(modeOfTransport.equals(ModeOfTransport.WALK)) {</span>
+<span class="nc" id="L258">                keyWord = &quot;Walk&quot;;</span>
+            } else {
+<span class="fc" id="L260">                keyWord = &quot;Drive&quot;;</span>
+            }
+<span class="fc bfc" id="L262" title="All 2 branches covered.">            if (turn == null) return keyWord + &quot; along &quot; + this.streetName + &quot; for &quot; + getDistance() + &quot; meters&quot;;</span>
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">            else if (turn.equals(&quot;forward&quot;)) return keyWord + &quot; forward along &quot; + this.streetName + &quot; for &quot; + getDistance() + &quot; meters&quot;;</span>
+<span class="fc" id="L264">            return &quot;Turn &quot; + turn + &quot; onto &quot; + this.streetName + &quot; and continue for &quot; + getDistance() + &quot; meters&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

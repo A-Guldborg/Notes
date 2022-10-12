@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rideit</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/help.css">
+</head>
+<body>
+<!-- Following section creates the menubar -->
+<div id="menubar-container">
+    <div id="menubar">
+        <div class="menuitem">
+            <a href="index.html">
+                <span class="material-icons">home</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="profile.html">
+                <span class="material-icons">account_circle</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="help.html">
+                <span class="material-icons">help</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="contact.html">
+                <span class="material-icons">textsms</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <!-- Following section creates the back-button -->
+    <button id="back-button" onclick="history.back()">
+        <span class="material-icons">arrow_back</span>
+    </button>
+
+    <!-- HEADER -->
+    <h2>Need help?</h2>
+
+    <!-- Following section creates the different help buttons -->
+    <div id="main">
+        <a class="box" href="help_payment.html">
+            <span class="material-icons" >
+                    paid
+            </span>
+            <h2> Payment </h2>
+        </a>
+
+        <a class="box " href="help_delete.html">
+            <span class="material-icons">
+                    description
+            </span>
+            <h2> Delete all info </h2>
+        </a>
+
+        <a class="box" href="help_ride.html">
+            <span class="material-icons">
+                    drive_eta
+            </span>
+            <h2> Book a ride </h2>
+        </a>
+
+        <!-- Following section creates the search bar -->
+        <form id="form" role="search" >
+            <input type="search" id="searchBar" placeholder="Search...">
+        </form>
+    </div>
+    <script type="module" src="scripts/help.js"> </script>
+</body>
+</html>

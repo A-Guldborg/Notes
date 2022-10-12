@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="bfst22.addressparser.MIDF" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-02-09T12:37:30" hostname="Andreass-MacBook-Air-4.local" time="0.128">
+  <properties/>
+  <testcase name="nullString()" classname="bfst22.addressparser.MIDF" time="0.128"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

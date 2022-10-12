@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.exam.chillhub.controllers.MediaViewController">
+    <ImageView fx:id="poster" fitHeight="418.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="24.0" />
+    <Label fx:id="title" layoutX="319.0" layoutY="22.0" prefHeight="30.0" prefWidth="1119.0" text="title" AnchorPane.leftAnchor="319.0" AnchorPane.rightAnchor="-238.0" AnchorPane.topAnchor="48.0">
+        <font>
+            <Font size="24.0" />
+        </font>
+    </Label>
+    <Label fx:id="year" layoutX="319.0" layoutY="90.0" prefHeight="16.0" prefWidth="124.0" text="1234" AnchorPane.leftAnchor="319.0" AnchorPane.topAnchor="90.0">
+        <graphic>
+            <Label text="Year:" />
+        </graphic>
+    </Label>
+    <Label fx:id="rating" layoutX="319.0" layoutY="118.0" prefHeight="16.0" prefWidth="124.0" text="9.7" AnchorPane.leftAnchor="319.0" AnchorPane.topAnchor="118.0">
+        <graphic>
+            <Label text="Rating:" />
+        </graphic>
+    </Label>
+    <Button fx:id="playBtn" layoutX="319.0" layoutY="156.0" mnemonicParsing="false" onAction="#onPlay" prefHeight="48.0" prefWidth="48.0" styleClass="media-btn" stylesheets="@../styles.css" AnchorPane.leftAnchor="319.0" AnchorPane.topAnchor="156.0" />
+    <Button fx:id="favoriteBtn" layoutX="375.0" layoutY="156.0" mnemonicParsing="false" onAction="#onFavoriteAction" prefHeight="48.0" prefWidth="48.0" styleClass="media-btn" stylesheets="@../styles.css" AnchorPane.leftAnchor="375.0" AnchorPane.topAnchor="156.0" />
+    <Button layoutX="1136.0" layoutY="24.0" mnemonicParsing="false" onAction="#onBack" styleClass="ui-transparent" stylesheets="@../styles.css" text="Close" AnchorPane.rightAnchor="24.0" AnchorPane.topAnchor="24.0" />
+    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" layoutX="167.0" layoutY="457.0" prefHeight="343.0" prefWidth="1200.0" stylesheets="@../styles.css" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="464.0">
+        <VBox fx:id="contentBox">
+            <Accordion fx:id="seasonsPane" />
+            <Label text="Related media">
+                <font>
+                    <Font size="24.0" />
+                </font>
+                <VBox.margin>
+                    <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                </VBox.margin>
+            </Label>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

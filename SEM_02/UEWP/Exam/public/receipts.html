@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rideit</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/receipts.css">
+</head>
+<body>
+<script type="module" src="scripts/receipts.js"> </script>
+<!-- Following section creates the menubar -->
+<div id="menubar-container">
+    <div id="menubar">
+        <div class="menuitem">
+            <a href="index.html">
+                <span class="material-icons">home</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="profile.html">
+                <span class="material-icons">account_circle</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="help.html">
+                <span class="material-icons">help</span>
+            </a>
+        </div>
+        <div class="menuitem">
+            <a href="contact.html">
+                <span class="material-icons">textsms</span>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- Following section creates the back-button -->
+<button id="back-button" onclick="history.back()">
+    <span class="material-icons">arrow_back</span>
+</button>
+
+<div id="originalReceipt" class="receipt box filled">
+    <span class="material-icons">drive_eta</span>
+    <span class="receipt_date"></span>
+    <p class="receipt_id"></p>
+</div>
+
+<div id="all-receipts"></div>
+
+<div id="popupbox" class="box">
+    <span class="material-icons" id="closebutton">close</span>
+    <p>Date: <span id="popupdate"></span></p>
+    <p>ID: <span id="popupid"></span></p>
+    <p>Distance: <span id="popupdistance"></span></p>
+    <p>Ride start: <span id="popupstart"></span></p>
+    <p>Ride end: <span id="popupend"></span></p>
+    <p>Car: <span id="popupcar"></span></p>
+    <p>Price: <span id="popupprice"></span></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CoordSet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">BFST22Group10.Models</a> &gt; <span class="el_source">CoordSet.java</span></div><h1>CoordSet.java</h1><pre class="source lang-java linenums">package BFST22Group10.Models;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class CoordSet implements Serializable, Comparable&lt;CoordSet&gt;, Pointable {
+    public static final long serialVersionUID = 11;
+    private final float[][] lat;
+    private final float[][] lon;
+    private final boolean isPolygon ;
+    private Tag mainTag;
+    private float minLat;
+    private float maxLat;
+    private float minLon;
+    private float maxLon;
+    private final float mainLat;
+    private final float mainLon;
+    
+<span class="fc" id="L19">    public CoordSet(float[][] lat, float[][] lon, boolean isPolygon) {</span>
+<span class="fc" id="L20">        this.lat = lat;</span>
+<span class="fc" id="L21">        this.lon = lon;</span>
+<span class="fc" id="L22">        this.isPolygon = isPolygon;</span>
+        //System.out.println(lat.length + &quot; &quot; + lon.length);
+        //System.out.println(lat[0].length + &quot; &quot; + lon[0].length);
+<span class="fc" id="L25">        findMinAndMax(lat, true);</span>
+<span class="fc" id="L26">        findMinAndMax(lon, false);</span>
+<span class="fc" id="L27">        mainLat = minLat + (maxLat-minLat)/2;</span>
+<span class="fc" id="L28">        mainLon = minLon + (maxLon-minLon)/2;</span>
+<span class="fc" id="L29">    }</span>
+
+    private void findMinAndMax(float[][] list, boolean lat) {
+<span class="fc" id="L32">        float min = 100;</span>
+<span class="fc" id="L33">        float max = 0;</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (float[] arrayList: list) {</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            for (float f: arrayList) {</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">                if (f &lt; min) min= f;</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">                if (f &gt; max) max = f;</span>
+            }
+        }
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (lat) {</span>
+<span class="fc" id="L41">            minLat = min;</span>
+<span class="fc" id="L42">            maxLat = max;</span>
+        }
+        else {
+<span class="fc" id="L45">            minLon = min;</span>
+<span class="fc" id="L46">            maxLon = max;</span>
+        }
+<span class="fc" id="L48">    }</span>
+    
+    public float[][] getLat() {
+<span class="fc" id="L51">        return lat;</span>
+    }
+    
+    public float[][] getLon() {
+<span class="fc" id="L55">        return lon;</span>
+    }
+
+    public boolean isPolygon() {
+<span class="fc" id="L59">        return isPolygon;</span>
+    }
+
+    public float getLatPoint() {
+<span class="nc" id="L63">        return mainLat;</span>
+    }
+
+    public float getLonPoint() {
+<span class="nc" id="L67">        return mainLon;</span>
+    }
+
+    public Tag getMainTag() {
+<span class="nc" id="L71">        return mainTag;</span>
+    }
+
+    public void setMainTag(Tag mainTag) {
+<span class="fc" id="L75">        this.mainTag = mainTag;</span>
+<span class="fc" id="L76">    }</span>
+
+    public float getMinLat() {
+<span class="fc" id="L79">        return minLat;</span>
+    }
+
+    public float getMaxLat() {
+<span class="fc" id="L83">        return maxLat;</span>
+    }
+
+    public float getMinLon() {
+<span class="fc" id="L87">        return minLon;</span>
+    }
+
+    public float getMaxLon() {
+<span class="fc" id="L91">        return maxLon;</span>
+    }
+
+    public double getBoxArea() {
+<span class="fc" id="L95">        return (this.maxLat - this.minLat) * (this.maxLon - this.minLon);</span>
+    }
+
+    public boolean isRoad() {
+<span class="nc" id="L99">        return mainTag.isRoad();</span>
+    }
+
+    @Override
+    public int compareTo(CoordSet other) {
+<span class="fc" id="L104">        return (int) (this.getBoxArea() - other.getBoxArea());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
