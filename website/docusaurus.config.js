@@ -12,18 +12,15 @@ async function config() {
   const mdxMermaid = await import('mdx-mermaid')
 
   return {
-    title: 'My Site',
+    title: 'ANH Notes',
     tagline: 'Dinosaurs are cool',
-    url: 'https://your-docusaurus-test-site.com',
+    url: 'https://github.com/A-Guldborg/',
     baseUrl: '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
-
-    // GitHub pages deployment config.
-    // If you aren't using GitHub pages, you don't need these.
-    organizationName: 'facebook', // Usually your GitHub org/user name.
-    projectName: 'docusaurus', // Usually your repo name.
+    organizationName: 'A-Guldborg', // Usually your GitHub org/user name.
+    projectName: 'Notes', // Usually your repo name.
 
     // Even if you don't use internalization, you can use this field to set useful
     // metadata like html lang. For example, if your site is Chinese, you may want
@@ -46,14 +43,14 @@ async function config() {
             // Please change this to your repo.
             // Remove this to remove the "edit this page" links.
             editUrl:
-              'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+              'https://github.com/A-Guldborg/Notes/tree/main/packages/create-docusaurus/templates/shared/',
           },
           blog: {
             showReadingTime: true,
             // Please change this to your repo.
             // Remove this to remove the "edit this page" links.
             editUrl:
-              'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+              'https://github.com/A-Guldborg/Notes/tree/main/packages/create-docusaurus/templates/shared/',
           },
           theme: {
             customCss: require.resolve('./src/css/custom.css'),
@@ -76,7 +73,7 @@ async function config() {
       /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
       ({
         navbar: {
-          title: 'My Site',
+          title: 'Notes',
           logo: {
             alt: 'My Site Logo',
             src: 'img/logo.svg',
@@ -120,7 +117,7 @@ async function config() {
             },
             {to: '/blog', label: 'Blog', position: 'left'},
             {
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/A-Guldborg/Notes',
               label: 'GitHub',
               position: 'right',
             },
@@ -164,7 +161,7 @@ async function config() {
                 },
                 {
                   label: 'GitHub',
-                  href: 'https://github.com/facebook/docusaurus',
+                  href: 'https://github.com/A-Guldborg/Notes',
                 },
               ],
             },
