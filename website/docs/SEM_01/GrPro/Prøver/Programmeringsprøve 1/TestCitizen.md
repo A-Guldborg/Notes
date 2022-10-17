@@ -1,3 +1,8 @@
+---
+title: TestCitizen
+---
+
+```java
 public class TestCitizen
 {
     public void testInit ()
@@ -15,3 +20,4 @@ public class TestCitizen
     }
     
 }
+```

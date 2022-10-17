@@ -1,3 +1,8 @@
+---
+title: IllegalVoteException
+---
+
+```java
 public class IllegalVoteException extends RuntimeException {
     protected char illegal_vote;
     
@@ -10,3 +15,4 @@ public class IllegalVoteException extends RuntimeException {
         return illegal_vote;
     }
 }
+```

@@ -1,3 +1,8 @@
+---
+title: Hand
+---
+
+```java
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,3 +84,4 @@ public class Hand {
         Collections.sort(cards);
     }
 }
+```

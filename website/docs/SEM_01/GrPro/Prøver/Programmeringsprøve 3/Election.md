@@ -1,3 +1,8 @@
+---
+title: Election
+---
+
+```java
 public class Election {
     protected String question;
     protected int yes;
@@ -49,3 +54,4 @@ public class Election {
         }
     }
 }
+```

@@ -1,3 +1,8 @@
+---
+title: FaceCard
+---
+
+```java
 public class FaceCard extends Card {
     protected String face;
     public FaceCard(String suit, String face) {
@@ -15,3 +20,4 @@ public class FaceCard extends Card {
         return "[" + suit + face + "]";
     }
 }
+```

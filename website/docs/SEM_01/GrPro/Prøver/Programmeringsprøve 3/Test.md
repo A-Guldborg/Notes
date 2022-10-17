@@ -1,3 +1,8 @@
+---
+title: Test
+---
+
+```java
 public class Test {
     public static void test() {
         Election e = new Election("Are fries better with remoulade than ketchup?");
@@ -37,3 +42,4 @@ public class Test {
         }
     }
 }
+```

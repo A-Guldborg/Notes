@@ -1,3 +1,8 @@
+---
+title: TestVaccine
+---
+
+```java
 public class TestVaccine
 {
     public void testVaccineInit ()
@@ -36,3 +41,4 @@ public class TestVaccine
         }
     }
 }
+```

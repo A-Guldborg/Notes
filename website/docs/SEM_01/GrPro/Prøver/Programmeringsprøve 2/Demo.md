@@ -1,3 +1,8 @@
+---
+title: Demo
+---
+
+```java
 public class Demo {    
     public static void demo() {
         Hand myHand = new Hand();
@@ -17,3 +22,4 @@ public class Demo {
         myHand.display();
     }
 }
+````

@@ -1,3 +1,8 @@
+---
+title: Card
+---
+
+```java
 public abstract class Card implements Comparable<Card> {
     protected String suit;
     public Card (String suit) {
@@ -14,3 +19,4 @@ public abstract class Card implements Comparable<Card> {
         }
     }
 }
+```

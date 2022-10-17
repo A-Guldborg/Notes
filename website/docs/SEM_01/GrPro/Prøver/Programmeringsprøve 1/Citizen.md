@@ -1,3 +1,8 @@
+---
+title: Citizen
+---
+
+```java
 public class Citizen {
     private String name;
     private int age;
@@ -57,3 +62,4 @@ public class Citizen {
         pass.show();
     }
 }
+```

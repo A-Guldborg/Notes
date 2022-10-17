@@ -1,3 +1,8 @@
+---
+title: NumberCard
+---
+
+```java
 public class NumberCard extends Card {
     protected int number;
     public NumberCard(String suit, int number) {
@@ -15,3 +20,4 @@ public class NumberCard extends Card {
         return "[" + suit + number + "]";
     }
 }
+```

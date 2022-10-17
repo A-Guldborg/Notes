@@ -1,3 +1,8 @@
+---
+title: TestCitizenUd
+---
+
+```java
 public class TestCitizenUd
 {
     public void testGiveVaccine()
@@ -33,3 +38,4 @@ public class TestCitizenUd
         cit3.showPassport();
     }
 }
+```

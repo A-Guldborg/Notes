@@ -1,3 +1,8 @@
+---
+title: VaccinePassport
+---
+
+```java
 public class VaccinePassport {
     private Vaccine[] vaccineProgress;
     private int nextFreeVaccine;
@@ -55,3 +60,4 @@ public class VaccinePassport {
         }
     }
 }
+```

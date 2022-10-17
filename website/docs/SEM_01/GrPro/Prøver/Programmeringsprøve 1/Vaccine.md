@@ -1,3 +1,8 @@
+---
+title: Vaccine
+---
+
+```java
 /**
  * @author Carl Clampenkoder
  */
@@ -27,4 +32,4 @@ public class Vaccine
         return nJabs;
     }
 }
-
+```
