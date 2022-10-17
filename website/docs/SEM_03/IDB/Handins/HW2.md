@@ -109,7 +109,7 @@ and c1.Continent = 'Asia'
 
 = 4
 ```
-npm 
+
 **(c)** In the countries of North America that have more than 1 million inhabitants, there are a total of 164,688,674 people that speak Spanish, according to the statistics in the database. What is the corresponding number for Europe?
 
 ```sql
