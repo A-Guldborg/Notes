@@ -4,6 +4,13 @@ to aguh's notes!
 
 Feel free to use as you please, see [MIT License](./LICENSE.md).
 
+## Docusaurus
+
+All files are / will in time be located in the [website](./website/) directory.  
+This directory stems from the [Docusaurus](https://docusaurus.io/) feature!
+
+That means, that you can view these notes as a nice, structured website. Just follow the [Installation Guide](InstallationGuide.md) to get started!
+
 ## Kattis
 
 Link to [Kattis repo](https://github.itu.dk/aguh/kattis)
