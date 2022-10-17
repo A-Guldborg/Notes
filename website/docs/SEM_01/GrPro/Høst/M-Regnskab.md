@@ -1,3 +1,8 @@
+---
+title: Regnskab
+---
+
+```java
 import java.util.Scanner;
 import java.util.HashMap;
 
@@ -81,3 +86,4 @@ public class Regnskab {
         hm.put("millioner", 1000000);
     }
 }
+```

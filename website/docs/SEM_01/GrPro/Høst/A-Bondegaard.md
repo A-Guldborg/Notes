@@ -1,3 +1,8 @@
+---
+title: Bondegaard
+---
+
+```java
 import java.util.Scanner;
 public class Bondegaard {
     public static void main(String[] args) {
@@ -8,3 +13,4 @@ public class Bondegaard {
         }
     }
 }
+```

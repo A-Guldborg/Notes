@@ -1,3 +1,8 @@
+---
+title: Selvsikker
+---
+
+```java
 import java.util.Scanner;
 public class Selvsikker {
     public static void main(String[] args) {
@@ -12,3 +17,4 @@ public class Selvsikker {
         System.out.println(String.join(" ", inputArray));
     }
 }
+```

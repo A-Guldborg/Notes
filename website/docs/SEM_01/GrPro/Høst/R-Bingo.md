@@ -1,3 +1,8 @@
+---
+title: Bingo
+---
+
+```java
 import java.util.Scanner;
 import java.util.Arrays;
 public class Bingo {
@@ -68,3 +73,4 @@ public class Bingo {
         }
     }
 }
+```

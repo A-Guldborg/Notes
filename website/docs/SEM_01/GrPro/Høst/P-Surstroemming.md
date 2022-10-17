@@ -1,3 +1,8 @@
+---
+title: Surstroemming
+---
+
+```java
 import java.util.Scanner;
 public class Surstroemming {
     public static void main(String[] args) {
@@ -18,3 +23,4 @@ public class Surstroemming {
         System.out.println("! " + x + " " + y + " " + z);
     }
 }
+```

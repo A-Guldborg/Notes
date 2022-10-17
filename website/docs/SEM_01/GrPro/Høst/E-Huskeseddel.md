@@ -1,3 +1,8 @@
+---
+title: Huskeseddel
+---
+
+```java
 import java.util.Scanner;
 public class Huskeseddel {
     public static void main(String[] args) {
@@ -10,3 +15,4 @@ public class Huskeseddel {
         System.out.println(output);
     }
 }
+```

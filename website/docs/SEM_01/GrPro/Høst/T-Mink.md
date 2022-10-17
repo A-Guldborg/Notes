@@ -1,3 +1,8 @@
+---
+title: Mink
+---
+
+```java
 import java.io.IOException;
 
 public class CopyOfMink {
@@ -80,3 +85,4 @@ public class CopyOfMink {
         return ret;
     }
 }
+```

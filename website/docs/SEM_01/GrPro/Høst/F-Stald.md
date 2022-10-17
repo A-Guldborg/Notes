@@ -1,3 +1,8 @@
+---
+title: Stald
+---
+
+```java
 import java.util.Scanner;
 public class Stald {
     public static void main(String[] args) {
@@ -15,3 +20,4 @@ public class Stald {
         System.out.println(maxfår - minfår);
     }
 }
+```

@@ -1,3 +1,8 @@
+---
+title: Gennemsnitsvaegt
+---
+
+```java
 import java.util.Scanner;
 public class Gennemsnitsvaegt {
     public static void main(String[] args) {
@@ -19,3 +24,4 @@ public class Gennemsnitsvaegt {
         System.out.println((double) weight / animals);
     }
 }
+```

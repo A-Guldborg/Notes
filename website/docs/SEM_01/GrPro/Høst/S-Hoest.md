@@ -1,3 +1,8 @@
+---
+title: Hoest
+---
+
+```java
 import java.util.Scanner;
 public class Hoest {
     public static void main(String[] args) {
@@ -51,3 +56,4 @@ public class Hoest {
         System.out.println(out);
     }
 }
+```

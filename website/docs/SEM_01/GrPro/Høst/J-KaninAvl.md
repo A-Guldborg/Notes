@@ -1,3 +1,8 @@
+---
+title: KaninAvl
+---
+
+```java
 import java.util.Scanner;
 import java.math.*;
 public class KaninAvl {
@@ -15,3 +20,4 @@ public class KaninAvl {
         }
     }
 }
+```

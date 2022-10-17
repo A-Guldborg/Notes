@@ -1,3 +1,8 @@
+---
+title: Adgangskode
+---
+
+```java
 import java.util.Scanner;
 public class Adgangskode {
     public static void main(String[] args) {
@@ -22,3 +27,4 @@ public class Adgangskode {
         System.out.println("*umuligt*");
     }
 }
+```

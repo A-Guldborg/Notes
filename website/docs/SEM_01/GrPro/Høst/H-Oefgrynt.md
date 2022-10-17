@@ -1,3 +1,8 @@
+---
+title: Oefgrynt
+---
+
+```java
 import java.util.Scanner;
 public class Oefgrynt {
     public static void main(String[] args) {
@@ -16,3 +21,4 @@ public class Oefgrynt {
         }
     }
 }
+```

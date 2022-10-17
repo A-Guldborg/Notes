@@ -1,3 +1,8 @@
+---
+title: Flest
+---
+
+```java
 import java.util.*;
 public class Flest {
     public static void main(String[] args) {
@@ -45,3 +50,4 @@ public class Flest {
         }
     }
 }
+```

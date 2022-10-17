@@ -1,3 +1,8 @@
+---
+title: Mejetaersker
+---
+
+```java
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,3 +69,4 @@ public class Mejetaersker {
         hm.put(3, m3);
     }
 }
+```

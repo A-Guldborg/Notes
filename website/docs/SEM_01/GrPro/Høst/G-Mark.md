@@ -1,3 +1,8 @@
+---
+title: Mark
+---
+
+```java
 import java.util.Scanner;
 public class Mark {
     public static void main(String[] args) {
@@ -20,3 +25,4 @@ public class Mark {
         System.out.println(sum);
     }
 }
+```

@@ -1,5 +1,10 @@
+---
+title: Korncirkler
+---
+
+```java
 import java.util.*;
-public class asdf {
+public class Korncirkler {
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         int b = s.nextInt(), h = s.nextInt();
@@ -32,7 +37,7 @@ public class asdf {
                 if (!currentxes.contains(centerx)) {
                     currentxes.add(centerx);
                     int ypos = y + 1;
-                    while (ypos < h - 1 && lines[ypos+1].charAt(centerx) == '#') {
+                    while (ypos < h - 1 && lines[ypos].charAt(centerx) == '#') {
                         ypos++;
                     }
                     System.out.println(centerx + " " + ((y + ypos) / 2));
@@ -48,3 +53,4 @@ public class asdf {
         }
     }
 }
+```
