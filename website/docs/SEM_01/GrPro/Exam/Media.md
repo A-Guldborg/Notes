@@ -1,3 +1,8 @@
+---
+title: Media
+---
+
+```java
 public abstract class Media {
     private String title;
     private int year;
@@ -19,3 +24,4 @@ public abstract class Media {
         this.title = newTitle;
     }
 }
+```

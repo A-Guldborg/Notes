@@ -1,3 +1,8 @@
+---
+title: User
+---
+
+```java
 import java.util.ArrayList;
 
 public class User {
@@ -12,3 +17,4 @@ public class User {
     }
 
 }
+```
