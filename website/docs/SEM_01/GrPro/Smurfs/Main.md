@@ -1,3 +1,8 @@
+---
+title: Main
+---
+
+```java
 public class Main {
     public static void main(String[] args) {
         Smurf superDan = new Smurf("Super Dan", 200);
@@ -11,3 +16,4 @@ public class Main {
         village.sendToWork();
     }
 }
+```

@@ -1,3 +1,8 @@
+---
+title: Village
+---
+
+```java
 import java.util.ArrayList;
 public class Village {
     private ArrayList<Smurf> villagers;
@@ -44,3 +49,4 @@ public class Village {
         }
     }
 }
+```

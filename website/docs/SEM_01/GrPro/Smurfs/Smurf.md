@@ -1,3 +1,8 @@
+---
+title: Smurf
+---
+
+```java
 public class Smurf {
     private String name;
     private float stamina;
@@ -33,3 +38,4 @@ public class Smurf {
         return this.stamina < 25;
     }
 }
+```
