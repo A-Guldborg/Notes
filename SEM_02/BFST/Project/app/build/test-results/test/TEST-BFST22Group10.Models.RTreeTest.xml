@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="BFST22Group10.Models.RTreeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2022-05-11T20:07:00" hostname="Andreass-MacBook-Air-4.local" time="0.025">
-  <properties/>
-  <testcase name="searchQueryWithZoomLevel()" classname="BFST22Group10.Models.RTreeTest" time="0.01"/>
-  <testcase name="searchQuery()" classname="BFST22Group10.Models.RTreeTest" time="0.014"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

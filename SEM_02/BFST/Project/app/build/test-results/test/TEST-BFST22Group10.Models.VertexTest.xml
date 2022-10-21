@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="BFST22Group10.Models.VertexTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2022-05-11T20:07:00" hostname="Andreass-MacBook-Air-4.local" time="0.03">
-  <properties/>
-  <testcase name="getters()" classname="BFST22Group10.Models.VertexTest" time="0.002"/>
-  <testcase name="edges()" classname="BFST22Group10.Models.VertexTest" time="0.001"/>
-  <testcase name="distance()" classname="BFST22Group10.Models.VertexTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
