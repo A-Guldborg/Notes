@@ -115,6 +115,12 @@ async function config() {
               position: 'left',
               label: '6th semester',
             },
+            {
+              type: 'doc',
+              docId: 'Kattis',
+              position: 'left',
+              label: 'Kattis',
+            },
             {to: '/blog', label: 'Blog', position: 'left'},
             {
               href: 'https://github.com/A-Guldborg/Notes',
