@@ -14,7 +14,7 @@ async function config() {
   return {
     title: 'ANH Notes',
     tagline: 'Dinosaurs are cool',
-    url: 'https://github.com/A-Guldborg/',
+    url: 'https://github.com/',
     baseUrl: '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
