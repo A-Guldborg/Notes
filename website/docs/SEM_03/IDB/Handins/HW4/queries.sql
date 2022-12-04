@@ -1,0 +1,44 @@
+CREATE TABLE P(
+    pid INTEGER PRIMARY KEY,
+    pn VARCHAR(50)
+);
+
+
+CREATE TABLE S(
+    sid INTEGER PRIMARY KEY,
+    sn VARCHAR(50)
+);
+
+CREATE TABLE M(
+    mid INTEGER PRIMARY KEY,
+    mn VARCHAR(50)
+);
+
+
+CREATE TABLE NewProjects(
+    id INTEGER NOT NULL,
+    pid INTEGER,
+    sid INTEGER,
+    mid INTEGER,
+    PRIMARY KEY(id, pid, sid),
+    FOREIGN KEY(pid) REFERENCES P(pid),
+    FOREIGN KEY(sid) REFERENCES S(sid),
+    FOREIGN KEY(mid) REFERENCES M(mid)
+);
+
+INSERT INTO P
+SELECT DISTINCT pid, pn
+FROM Projects;
+
+INSERT INTO S
+SELECT DISTINCT sid, sn
+FROM Projects;
+
+
+INSERT INTO M
+SELECT DISTINCT mid, mn
+FROM Projects;
+
+INSERT INTO NewProjects
+SELECT id, pid, sid, mid
+FROM Projects;
