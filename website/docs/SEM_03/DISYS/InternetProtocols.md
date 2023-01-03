@@ -4,9 +4,21 @@
 
 Guarantees packets are received. Uses 3-way handshake.
 
+Connection-oriented, reliable streaming protocol.
+
+Used by web-servers/HTTP on port 80 and E-Mail/SMTP on port 25.
+
+### 3-way handshake
+
+[3-way handshake](./assets/3wayhandshake.png)
+
 ## UDP
 
 Sends out a lot of packets and does not guarantee receival, convenient for things like streaming or DNS servers that gets many queries.
+
+Connection-less, unreliable, datagram-protocol.
+
+Used by DNS lookups on port 53.
 
 ## HTTP
 

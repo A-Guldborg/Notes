@@ -13,7 +13,6 @@ Pointer|Points to the first element of the slice. Since the pointer points to an
 Length `(len)`|The number of elements of the slice
 Capacity `(cap)`|At least as big as the length, and usually the number of elements from the pointer to the last element of the underlying array.
 
-
 Goroutines correspond to threads in golang.  
 Processes start goroutines, so one process can start multiple goroutines.  
 Start a goroutine by adding “go “ before a function call.  

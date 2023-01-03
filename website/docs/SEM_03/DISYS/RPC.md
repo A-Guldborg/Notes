@@ -44,7 +44,18 @@ The microservice remembers the requester
 
 The microservice does not remember the requester and the requester must encode the required information from the requester in each request.
 
+## Restful services
+
+HTTP methods|Usage
+--|--
+POST|Send data
+GET|Retrieve a resource
+PUT|Store a resource
+DELETE|Delete a resource
+
 ## gRPC
+
+Google's new remote protocol procedures which creates an interface such that the server knows which methods can be used on it, while the client knows which methods it can call on the server. Uses a proto file and a `protoc` command to build the interface.
 
 Good for internal microservices where the two actors (client + server) can agree upon the data format. For external microservices, RESTful services are a better option.
 
@@ -57,3 +68,9 @@ gRPC supports both.
 ### Streaming
 
 Streaming goes one or two ways and is several messages from one client to a server or vice versa. This can be server-streaming, client-streaming or bi-directional-streaming.
+
+## Microservices
+
+Where a monolith server architecture builds all required services into one process, a microservice architecture builds services independently and distribute these to servers where they are needed.
+
+This allows for independent development teams for each microservice, as well as independent releases.

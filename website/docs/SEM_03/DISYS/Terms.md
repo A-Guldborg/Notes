@@ -19,6 +19,9 @@ Service Level Agreements (SLA)|The agreement with a customer to the consequences
 Head-of-line blocking|When a few slow processes block faster processes to be performed, making small/fast processes have slower response times than they should.
 Tail latency Amplification|When a request requires multiple calls for the backend services and the response time is slow due to one or few ongoing processes, despite many faster processes.
 Elastic|Dynamically/Automatically add computing resources when necessary.
+Processess|Runs on hosts. They send and receive messages on communication channels. Subject to failures. Failures yield dropped, lost reordered or duplicated messages.
+Checksums|Hash sent messages so the recipient can check if the sums match. This verifies messages are not corrupted.
+Acknowledgements|
 
 ## Ch. 1 - Reliable, Scalable and Maintainable Applications
 Most applications are more data-intensive than compute-intensive.  

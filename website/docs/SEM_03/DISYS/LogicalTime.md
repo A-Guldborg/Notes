@@ -2,15 +2,6 @@
 
 ## Processes
 
-Each process p<sub>i</sub> in p<sub>1</sub>,...p<sub>n</sub> has a `clock` C<sub>i</sub>.
-
-Process p<sub>i</sub> also has state s<sub>i</sub>
-
-Processes have actions:
-
-- Send
-- Receive
-- Internal
 
 ## Events
 
